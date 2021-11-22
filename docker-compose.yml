@@ -1,0 +1,66 @@
+version: '3.7'
+
+networks:
+  dashy-net:
+    driver: bridge
+
+services:
+  docker-exporter:
+    container_name: dashy_docker-exporter
+    image: prometheusnet/docker_exporter:latest
+    restart: always
+    networks:
+      - dashy-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  prometheus:
+    container_name: dashy_prometheus
+    image: prom/prometheus:v2.31.1
+    hostname: prometheus
+    restart: always
+    ports:
+      - 9090:9090
+    networks:
+      - dashy-net
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./deployment/prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=10y"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+
+  grafana:
+    container_name: dashy_grafana
+    image: grafana/grafana:8.2.5
+    hostname: grafana
+    restart: always
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: secret
+    networks:
+      - dashy-net
+    depends_on:
+      - prometheus
+    ports:
+      - 2012:3000
+    volumes:
+      - ./deployment/grafana_data:/var/lib/grafana
+      - ./config/grafana/:/etc/grafana/provisioning/
+      - ./config/grafana/grafana.ini:/etc/grafana/grafana.ini
+
+  api:
+    container_name: dashy_api
+    image: dashy_api
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: always
+    networks:
+      - dashy-net
+    ports:
+      - 3333:3333
+    depends_on:
+      - prometheus

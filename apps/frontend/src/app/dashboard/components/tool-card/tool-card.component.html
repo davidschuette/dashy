@@ -1,0 +1,21 @@
+<div class="card h-100">
+    <img [src]="'assets/icons/' + tool?.img" class="card-img-top" alt="...">
+    <div class="card-body">
+        <h5 class="card-title">{{tool?.name}}</h5>
+        <p class="card-text">{{tool?.description}}</p>
+    </div>
+    <ul class="list-group list-group-flush">
+
+        <li class="list-group-item" *ngIf="tool?.status === STATUS.ONLINE">Status: <span
+                class="badge bg-success text-light">Online</span></li>
+        <li class="list-group-item" *ngIf="tool?.status === STATUS.MAINTENANCE">Status: <span
+                class="badge bg-warning text-bark">Wartung</span></li>
+        <li class="list-group-item" *ngIf="tool?.status === STATUS.OFFLINE">Status: <span
+                class="badge bg-danger text-light">Offline</span></li>
+        <li class="list-group-item"><a rel="noopener nofollow noreferrer" [href]="tool?.url"
+                class="card-link">Öffnen</a></li>
+    </ul>
+    <div class="card-footer">
+        <small class="text-muted">Last backup 12 hours ago.</small>
+    </div>
+</div>
