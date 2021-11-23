@@ -68,6 +68,58 @@
       },
       "tags": []
     },
+    "backup": {
+      "root": "apps/backup",
+      "sourceRoot": "apps/backup/src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/backup",
+            "main": "apps/backup/src/main.ts",
+            "tsConfig": "apps/backup/tsconfig.app.json",
+            "assets": ["apps/backup/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/backup/src/environments/environment.ts",
+                  "with": "apps/backup/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "backup:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/backup/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/backup"],
+          "options": {
+            "jestConfig": "apps/backup/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "frontend": {
       "projectType": "application",
       "root": "apps/frontend",
