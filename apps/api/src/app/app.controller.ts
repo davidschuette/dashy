@@ -15,4 +15,9 @@ export class AppController {
   getTools() {
     return this.appService.getTools()
   }
+
+  @Get('storage')
+  getStorage() {
+    return this.appService.getStorage()
+  }
 }

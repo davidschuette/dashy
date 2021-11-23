@@ -1,3 +1,21 @@
 <div class="progress">
-    <div class="progress-bar w-75" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+  <div
+    class="progress-bar"
+    role="progressbar"
+    [style]="'width:' + storage?.percent + '%'"
+    attr.aria-valuenow="{{ storage?.percent }}"
+    aria-valuemin="0"
+    aria-valuemax="100"
+  ></div>
+  <div
+    class="progress-bar bg-white text-dark"
+    role="progressbar"
+    [style]="'width:' + (100 - (storage?.percent || 0)) + '%'"
+    attr.aria-valuenow="{{ storage?.percent }}"
+    attr.aria-valuenow="{{ storage?.percent }}"
+    aria-valuemin="0"
+    aria-valuemax="100"
+  >
+    {{ storage?.remaining }}
+  </div>
 </div>

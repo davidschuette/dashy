@@ -1,34 +1,19 @@
-import { Component } from '@angular/core'
-import { Tool } from '../../../models/tool'
-import { ToolStatus } from '../../../models/tool-status'
+import { Component, Input, OnInit } from '@angular/core'
+import { ToolDto } from '@dashy/api-interfaces'
+import { Observable, of } from 'rxjs'
+import { DashboardService } from '../../services/dashboard.service'
 
 @Component({
   selector: 'dashy-tool-card-gallery',
   templateUrl: './tool-card-gallery.component.html',
   styleUrls: ['./tool-card-gallery.component.scss'],
 })
-export class ToolCardGalleryComponent {
-  tools: Tool[] = [
-    {
-      name: 'overleaf',
-      status: ToolStatus.ONLINE,
-      description: 'secsascas',
-      url: 'https://overleaf.lyop.de',
-      img: 'overleaf.svg',
-    },
-    {
-      name: 'overleaf',
-      status: ToolStatus.MAINTENANCE,
-      description: 'secsascas',
-      url: 'https://overleaf.lyop.de',
-      img: 'overleaf.svg',
-    },
-    {
-      name: 'overleaf',
-      status: ToolStatus.OFFLINE,
-      description: 'secsascas',
-      url: 'https://overleaf.lyop.de',
-      img: 'overleaf.svg',
-    },
-  ]
+export class ToolCardGalleryComponent implements OnInit {
+  tools$: Observable<ToolDto[]> = of([])
+
+  constructor(private readonly dashboardService: DashboardService) {}
+
+  ngOnInit() {
+    this.tools$ = this.dashboardService.getTools()
+  }
 }

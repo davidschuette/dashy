@@ -1,3 +1,24 @@
+:host {
+  display: block;
+  box-shadow: 2px 2px 5px grey;
+  background-repeat: 0.25em;
+}
+
 .badge {
-  transform: translateY(-0.15em);
+  transform: translateY(-0.1em);
+}
+
+img {
+  height: 15em;
+  width: 100%;
+  object-fit: contain;
+}
+
+.card-body {
+  white-space: pre-wrap;
+}
+
+.description {
+  max-height: 15em;
+  overflow: auto;
 }

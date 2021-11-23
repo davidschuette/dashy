@@ -1,6 +1,5 @@
-import { Component, Input } from '@angular/core'
-import { Tool } from '../../../models/tool'
-import { ToolStatus } from '../../../models/tool-status'
+import { Component, Input, OnInit } from '@angular/core'
+import { AccountCreation, ToolDto, ToolStatus } from '@dashy/api-interfaces'
 
 @Component({
   selector: 'dashy-tool-card',
@@ -8,6 +7,7 @@ import { ToolStatus } from '../../../models/tool-status'
   styleUrls: ['./tool-card.component.scss'],
 })
 export class ToolCardComponent {
-  @Input() tool?: Tool
+  @Input() tool: ToolDto
   readonly STATUS = ToolStatus
+  readonly CREATION = AccountCreation
 }
