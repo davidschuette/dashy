@@ -6,10 +6,11 @@ import { StorageBarComponent } from './components/storage-bar/storage-bar.compon
 import { DashboardService } from './services/dashboard.service'
 import { HttpClientModule } from '@angular/common/http'
 import { PageComponent } from './containers/page/page.component'
+import { TimeDiffPipe } from '../pipes/time-diff.pipe'
 
 @NgModule({
   providers: [DashboardService],
-  declarations: [ToolCardComponent, ToolCardGalleryComponent, StorageBarComponent, PageComponent],
+  declarations: [ToolCardComponent, ToolCardGalleryComponent, StorageBarComponent, PageComponent, TimeDiffPipe],
   imports: [CommonModule, HttpClientModule],
   exports: [PageComponent],
 })

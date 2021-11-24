@@ -54,6 +54,9 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     restart: always
+    volumes:
+      - ${PWD}/deployment/api_data/tools.json:/usr/src/tools.json
+      - ${PWD}/deployment/api_data/backups.json:/usr/src/backups.json
     networks:
       - dashy-net
     ports:

@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
 import { firstValueFrom, map } from 'rxjs'
 import { AccountCreation, StorageDto, ToolDto, ToolStatus } from '@dashy/api-interfaces'
 import { exec } from 'child_process'
+import { readFileSync, writeFileSync } from 'fs'
+import { BackupService } from './backup/backup.service'
 
 @Injectable()
 export class AppService {
-  private readonly tools = [
+  private readonly STORAGE_PATH = 'tools.json'
+  private tools = [
     {
       name: 'Overleaf',
       description:
@@ -15,6 +18,7 @@ export class AppService {
       img: 'overleaf.svg',
       containerNames: ['sharelatex', 'redis', 'mongo'],
       accountCreation: AccountCreation.ON_REQUEST,
+      isInMaintenance: false,
     },
     {
       name: 'Nextcloud',
@@ -25,6 +29,7 @@ Ebenfalls sind Videokonferenzen und das „Teilen“ des eigenen Bildschirms mö
       img: 'nextcloud.svg',
       containerNames: ['nextcloud_app_1', 'nextcloud_db_1'],
       accountCreation: AccountCreation.ON_REQUEST,
+      isInMaintenance: false,
     },
     {
       name: 'Send',
@@ -34,6 +39,7 @@ So bleiben deine geteilten Inhalte privat und du kannst sicherstellen, dass dein
       img: 'send.svg',
       containerNames: ['send_send_1', 'send_redis_1'],
       accountCreation: AccountCreation.NO_ACCOUNT,
+      isInMaintenance: false,
     },
     {
       name: 'BitWarden',
@@ -56,6 +62,7 @@ So bleiben deine geteilten Inhalte privat und du kannst sicherstellen, dass dein
         'bitwarden-notifications',
       ],
       accountCreation: AccountCreation.SELF,
+      isInMaintenance: false,
     },
     {
       name: 'Plex',
@@ -64,10 +71,21 @@ So bleiben deine geteilten Inhalte privat und du kannst sicherstellen, dass dein
       img: 'plex.png',
       containerNames: [],
       accountCreation: AccountCreation.ON_REQUEST,
+      isInMaintenance: false,
     },
   ]
 
-  constructor(private readonly http: HttpService) {}
+  constructor(private readonly http: HttpService, private readonly backupService: BackupService) {
+    this.loadFromDrive()
+  }
+
+  private loadFromDrive() {
+    this.tools = JSON.parse(readFileSync(this.STORAGE_PATH).toString())
+  }
+
+  private flushToDrive() {
+    writeFileSync(this.STORAGE_PATH, JSON.stringify(this.tools))
+  }
 
   async getTools(): Promise<ToolDto[]> {
     const states = await firstValueFrom(
@@ -97,9 +115,16 @@ So bleiben deine geteilten Inhalte privat und du kannst sicherstellen, dass dein
       dto.img = tool.img
       dto.url = tool.url
       dto.accountCreation = tool.accountCreation
-      dto.status = tool.containerNames.every((name) => states.find((_) => _.metric.name === name)?.value[1] === '1' || false)
-        ? ToolStatus.ONLINE
-        : ToolStatus.OFFLINE
+
+      dto.lastBackup = this.backupService.getLastBackupTime(tool.name) || 0
+
+      if (tool.isInMaintenance) {
+        dto.status = ToolStatus.MAINTENANCE
+      } else {
+        dto.status = tool.containerNames.every((name) => states.find((_) => _.metric.name === name)?.value[1] === '1' || false)
+          ? ToolStatus.ONLINE
+          : ToolStatus.OFFLINE
+      }
 
       return dto
     })
@@ -128,7 +153,7 @@ So bleiben deine geteilten Inhalte privat und du kannst sicherstellen, dass dein
   }
 
   getStorage(): Promise<StorageDto> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const process = exec(`df -h / | tail -n 1 | awk '{ print $4,$5 }'`)
       let result = ''
 
@@ -146,5 +171,23 @@ So bleiben deine geteilten Inhalte privat und du kannst sicherstellen, dass dein
         resolve(res)
       })
     })
+  }
+
+  clearMaintenanceStatus(toolName: string) {
+    const tool = this.tools.find((_) => _.name === toolName)
+
+    if (!tool) throw new NotFoundException('ToolNotFound')
+
+    tool.isInMaintenance = false
+    this.flushToDrive()
+  }
+
+  setMaintenanceStatus(toolName: string) {
+    const tool = this.tools.find((_) => _.name === toolName)
+
+    if (!tool) throw new NotFoundException('ToolNotFound')
+
+    tool.isInMaintenance = true
+    this.flushToDrive()
   }
 }

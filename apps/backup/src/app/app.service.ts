@@ -15,7 +15,7 @@ export class AppService {
 
   syncFolder(folderName: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const command = exec(`rsync --delete -az root@lyop.de:${this.BASE_PATH}/${folderName} ${folderName}`)
+      const command = exec(`rsync --delete -az root@lyop.de:${this.BASE_PATH}/${folderName}/ ./${folderName}/`)
 
       command.on('error', (err) => {
         console.error(err)
