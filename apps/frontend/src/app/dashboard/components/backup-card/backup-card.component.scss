@@ -1,0 +1,14 @@
+div.card {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 10em 1fr;
+
+  .card-body {
+    border-left: 1px solid rgba(0, 0, 0, 0.125);
+    padding-left: 0;
+    padding-right: 0;
+
+    ul {
+    }
+  }
+}
