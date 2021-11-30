@@ -1,9 +1,7 @@
 ##########################
 # Build Stage
 
-FROM node:16-alpine
-
-RUN apk --no-cache add --virtual python
+FROM node:16
 
 # Create app directory
 WORKDIR /usr/src
