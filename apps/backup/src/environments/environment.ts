@@ -5,6 +5,7 @@ export const environment: EnvironmentModel = {
   production: false,
   apiPath: '/api/',
   sshBase: 'omnikron@lyop.de',
+  storage: './data/',
   backups: [
     {
       archiveName: 'overleaf.tar.gz',

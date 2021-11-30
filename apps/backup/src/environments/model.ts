@@ -5,4 +5,5 @@ export interface EnvironmentModel {
   readonly apiPath: string
   readonly backups: ToolBackup[]
   readonly sshBase: string
+  readonly storage: string
 }

@@ -34,7 +34,7 @@ export class AppService implements OnModuleInit {
 
   syncFolder(folderName: string, basePath: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const command = exec(`rsync --delete -az ${environment.sshBase}:${basePath}/${folderName}/ ./${folderName}/`)
+      const command = exec(`rsync --delete -az ${environment.sshBase}:${basePath}/${folderName}/ ${environment.storage}${folderName}/`)
 
       command.on('error', (err) => {
         console.error(err)
@@ -64,7 +64,7 @@ export class AppService implements OnModuleInit {
 
   async getRawSizeOfBackup(tool: ToolBackup): Promise<string> {
     return new Promise((resolve, reject) => {
-      const command = exec(`du -hs ${tool.folderName} | awk '{ print $1 }'`)
+      const command = exec(`du -hs ${environment.storage}${tool.folderName} | awk '{ print $1 }'`)
       let result = ''
 
       command.on('error', (err) => {
@@ -82,7 +82,7 @@ export class AppService implements OnModuleInit {
 
   async getCompressedSizeOfBackup(tool: ToolBackup): Promise<string> {
     return new Promise((resolve, reject) => {
-      const command = exec(`ls -lh ${tool.archiveName} | awk '{ print $5 }'`)
+      const command = exec(`ls -lh ${environment.storage}${tool.archiveName} | awk '{ print $5 }'`)
       let result = ''
 
       command.on('error', (err) => {
@@ -142,7 +142,7 @@ export class AppService implements OnModuleInit {
 
   createArchive(tool: ToolBackup): Promise<void> {
     return new Promise((resolve, reject) => {
-      const command = exec(`tar -cz ${tool.folderName} -f ${tool.archiveName}`)
+      const command = exec(`tar -cz ${environment.storage}${tool.folderName} -f ${environment.storage}${tool.archiveName}`)
 
       command.on('error', (err) => {
         console.error(err)

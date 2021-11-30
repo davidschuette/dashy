@@ -4,6 +4,7 @@ export const environment: EnvironmentModel = {
   production: true,
   apiPath: 'https://lyop.de/api/',
   sshBase: 'omnikron@lyop.de',
+  storage: '/usr/src/data/',
   backups: [
     {
       toolName: 'Overleaf',
