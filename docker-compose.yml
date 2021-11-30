@@ -85,4 +85,6 @@ services:
       context: .
       dockerfile: apps/backup/Dockerfile
     restart: always
+    volumes:
+      - ./data:/usr/src/data
 
