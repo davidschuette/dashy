@@ -19,11 +19,11 @@ COPY ./tsconfig*.json ./
 COPY ./.eslintrc.json ./
 
 # Bundle app source
-COPY ./apps/api/. ./apps/api
+COPY ./apps/backup/. ./apps/backup
 COPY ./libs/. ./libs
 
 # Run build
-RUN npm run build -- api --prod
+RUN npm run build -- backup --prod
 
 ##########################
 # Run Stage
@@ -41,7 +41,7 @@ COPY --from=0 /usr/src/decorate-angular-cli.js ./
 # Install packages needed for production
 RUN npm ci --only=production --no-progress --no-audit --prefer-offline
 
-COPY --from=0 /usr/src/dist/apps/api ./
+COPY --from=0 /usr/src/dist/apps/backup ./
 
 # Checking the health route of the service itself
 # HEALTHCHECK --interval=10s --timeout=5s --retries=5 \
