@@ -2,7 +2,8 @@ import { EnvironmentModel } from './model'
 
 export const environment: EnvironmentModel = {
   production: true,
-  apiPath: 'http://localhost:2015/api/',
+  apiPath: 'https://lyop.de/api/',
+  sshBase: 'omnikron@lyop.de',
   backups: [
     {
       toolName: 'Overleaf',

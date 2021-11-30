@@ -4,6 +4,7 @@ import { EnvironmentModel } from './model'
 export const environment: EnvironmentModel = {
   production: false,
   apiPath: '/api/',
+  sshBase: 'omnikron@lyop.de',
   backups: [
     {
       archiveName: 'overleaf.tar.gz',

@@ -28,7 +28,7 @@ RUN npm run build -- api --prod
 ##########################
 # Run Stage
 
-FROM node:16-alpine
+FROM node:16
 
 # RUN apk --no-cache add --virtual builds-deps build-base python curl
 

@@ -34,7 +34,7 @@ export class AppService implements OnModuleInit {
 
   syncFolder(folderName: string, basePath: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const command = exec(`rsync --delete -az root@lyop.de:${basePath}/${folderName}/ ./${folderName}/`)
+      const command = exec(`rsync --delete -az ${environment.sshBase}:${basePath}/${folderName}/ ./${folderName}/`)
 
       command.on('error', (err) => {
         console.error(err)
@@ -49,7 +49,7 @@ export class AppService implements OnModuleInit {
 
   executeRemoteCommand(name: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const command = exec(`ssh root@lyop.de '${name}'`)
+      const command = exec(`ssh ${environment.sshBase} '${name}'`)
 
       command.on('error', (err) => {
         console.error(err)
