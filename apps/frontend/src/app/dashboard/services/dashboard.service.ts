@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { StorageDto, ToolDto } from '@dashy/api-interfaces'
+import { BackupDto, StorageDto, ToolDto } from '@dashy/api-interfaces'
 import { Observable } from 'rxjs'
 
 @Injectable({
@@ -15,5 +15,9 @@ export class DashboardService {
 
   getStorage(): Observable<StorageDto> {
     return this.http.get<StorageDto>('/api/storage')
+  }
+
+  getBackups(): Observable<BackupDto[]> {
+    return this.http.get<BackupDto[]>('/api/backups')
   }
 }

@@ -40,3 +40,8 @@ Thumbs.db
 
 .angular
 deployment
+overleaf
+nextcloud
+send
+bitwarden
+*.tar.gz

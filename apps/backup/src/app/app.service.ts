@@ -1,24 +1,40 @@
-import { Injectable } from '@nestjs/common'
-import { exec } from 'child_process'
-import { ToolBackup } from './models/tool-backup'
+import { BackupDto } from '@dashy/api-interfaces'
 import { HttpService } from '@nestjs/axios'
+import { Injectable, OnModuleInit } from '@nestjs/common'
+import { SchedulerRegistry } from '@nestjs/schedule'
+import { exec } from 'child_process'
+import { CronJob } from 'cron'
 import { firstValueFrom } from 'rxjs'
+import { environment } from '../environments/environment'
+import { ToolBackup } from './models/tool-backup'
 
 @Injectable()
-export class AppService {
-  private readonly BASE_PATH = '/home/dave/deployment'
-  private readonly API_PATH = 'http://localhost:2015/api/'
-  getData(): { message: string } {
-    return { message: 'Welcome to backup!' }
+export class AppService implements OnModuleInit {
+  constructor(private readonly http: HttpService, private readonly schedulerRegistry: SchedulerRegistry) {}
+
+  onModuleInit() {
+    this.initialiseBackupCronJobs()
   }
 
-  constructor(private readonly http: HttpService) {
-    this.triggerBackup()
+  async initialiseBackupCronJobs() {
+    const backups = environment.backups
+
+    for (const backup of backups) {
+      const job = new CronJob(backup.cron, () => {
+        console.log(`Job for tool ${backup.toolName} is running`)
+        this.backupTool(backup)
+      })
+
+      this.schedulerRegistry.addCronJob(backup.toolName, job)
+      job.start()
+
+      console.log(`Job for tool ${backup.toolName} has been scheduled with cron '${backup.cron}'`)
+    }
   }
 
-  syncFolder(folderName: string): Promise<void> {
+  syncFolder(folderName: string, basePath: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const command = exec(`rsync --delete -az root@lyop.de:${this.BASE_PATH}/${folderName}/ ./${folderName}/`)
+      const command = exec(`rsync --delete -az root@lyop.de:${basePath}/${folderName}/ ./${folderName}/`)
 
       command.on('error', (err) => {
         console.error(err)
@@ -46,32 +62,87 @@ export class AppService {
     })
   }
 
+  async getRawSizeOfBackup(tool: ToolBackup): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const command = exec(`du -hs ${tool.folderName} | awk '{ print $1 }'`)
+      let result = ''
+
+      command.on('error', (err) => {
+        console.error(err)
+        reject()
+      })
+
+      command.stdout.on('data', (chunk) => (result += chunk))
+
+      command.on('exit', () => {
+        resolve(result.replace('\n', ''))
+      })
+    })
+  }
+
+  async getCompressedSizeOfBackup(tool: ToolBackup): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const command = exec(`ls -lh ${tool.archiveName} | awk '{ print $5 }'`)
+      let result = ''
+
+      command.on('error', (err) => {
+        console.error(err)
+        reject()
+      })
+
+      command.stdout.on('data', (chunk) => (result += chunk))
+
+      command.on('exit', () => {
+        resolve(result.replace('\n', ''))
+      })
+    })
+  }
+
   async backupTool(tool: ToolBackup) {
     const time = Date.now()
+
     console.log(`Starting backup ${tool.folderName}`)
+
     if (tool.commands) {
+      await this.setMaintenanceStatus(tool.toolName)
       await this.executeRemoteCommand(tool.commands.stop)
       console.log(`Stopped ${tool.folderName}`)
     } else {
       console.log(`No commands ${tool.folderName}`)
     }
 
-    await this.syncFolder(tool.folderName)
+    await this.syncFolder(tool.folderName, tool.basePath)
     console.log(`Synced folder ${tool.folderName}`)
 
     if (tool.commands) {
       await this.executeRemoteCommand(tool.commands.start)
       console.log(`Restarted ${tool.folderName}`)
+      await this.clearMaintenanceStatus(tool.toolName)
     }
+
+    const downtime = Date.now() - time
 
     await this.createArchive(tool)
     const diff = Date.now() - time
     console.log(`Archived ${tool.folderName} in ${diff}ms`)
+
+    const [rawSize, compressedSize] = await Promise.all([this.getRawSizeOfBackup(tool), this.getCompressedSizeOfBackup(tool)])
+
+    await this.notifyServer({
+      date: Date.now(),
+      toolName: tool.toolName,
+      img: tool.img,
+      downtime,
+      duration: diff,
+      compression: diff - downtime,
+      rawSize,
+      compressedSize,
+    })
   }
 
   createArchive(tool: ToolBackup): Promise<void> {
     return new Promise((resolve, reject) => {
-      const command = exec(`tar -cz ${tool.folderName} -f ${tool.archiveName}.tar.gz`)
+      const command = exec(`tar -cz ${tool.folderName} -f ${tool.archiveName}`)
 
       command.on('error', (err) => {
         console.error(err)
@@ -84,26 +155,15 @@ export class AppService {
     })
   }
 
-  triggerBackup() {
-    this.backupTool({
-      archiveName: 'overleaf',
-      folderName: 'overleaf',
-      commands: {
-        start: 'cd /home/dave/deployment/overleaf && docker-compose up -d',
-        stop: 'cd /home/dave/deployment/overleaf && docker-compose down',
-      },
-    })
-  }
-
   setMaintenanceStatus(toolName: string) {
-    return firstValueFrom(this.http.post<void>(this.API_PATH + `tools/${toolName}/maintenance`))
+    return firstValueFrom(this.http.post<void>(environment.apiPath + `tools/${toolName}/maintenance`))
   }
 
   clearMaintenanceStatus(toolName: string) {
-    return firstValueFrom(this.http.delete<void>(this.API_PATH + `tools/${toolName}/maintenance`))
+    return firstValueFrom(this.http.delete<void>(environment.apiPath + `tools/${toolName}/maintenance`))
   }
 
-  notifyServer() {
-    return firstValueFrom(this.http.post<void>(this.API_PATH + 'backups/'))
+  notifyServer(data: BackupDto) {
+    return firstValueFrom(this.http.post<void>(environment.apiPath + 'backups/', data))
   }
 }

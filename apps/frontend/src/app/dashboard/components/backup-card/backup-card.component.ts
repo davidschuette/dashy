@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input } from '@angular/core'
 import { BackupDto } from '@dashy/api-interfaces'
 
 @Component({
@@ -6,10 +6,6 @@ import { BackupDto } from '@dashy/api-interfaces'
   templateUrl: './backup-card.component.html',
   styleUrls: ['./backup-card.component.scss'],
 })
-export class BackupCardComponent implements OnInit {
+export class BackupCardComponent {
   @Input() backup: BackupDto
-
-  constructor() {}
-
-  ngOnInit(): void {}
 }

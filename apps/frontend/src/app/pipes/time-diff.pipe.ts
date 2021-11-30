@@ -11,7 +11,6 @@ import { Pipe, PipeTransform } from '@angular/core'
 @Pipe({ name: 'timeDiff' })
 export class TimeDiffPipe implements PipeTransform {
   transform(value: number): string {
-    console.log(value, 24 * 60 * 60 * 1000)
     if (value < 24 * 60 * 60 * 1000) {
       if (value < 60 * 60 * 1000) {
         if (value < 60 * 1000) {

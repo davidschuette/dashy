@@ -1,2 +1,1 @@
-<p>backup works!</p>
-<dashy-backup-card></dashy-backup-card>
+<dashy-backup-card *ngFor="let backup of backups$ | async" [backup]="backup"></dashy-backup-card>

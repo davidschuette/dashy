@@ -13,10 +13,9 @@ export class BackupService {
   }
 
   private loadFromDrive() {
-    this.backups = (JSON.parse(readFileSync(this.STORAGE_PATH).toString()) as BackupDto[]).map(({ date, toolName, duration }) => ({
+    this.backups = (JSON.parse(readFileSync(this.STORAGE_PATH).toString()) as BackupDto[]).map(({ date, ...rest }) => ({
       date: new Date(date),
-      duration,
-      toolName,
+      ...rest,
     }))
   }
 
@@ -24,14 +23,14 @@ export class BackupService {
     writeFileSync(this.STORAGE_PATH, JSON.stringify(this.backups))
   }
 
-  createBackup({ date, duration, toolName }: BackupDto) {
-    const obj = new Backup(new Date(date), duration, toolName)
+  createBackup({ date, downtime, compressedSize, compression, duration, img, rawSize, toolName }: BackupDto) {
+    const obj = new Backup(new Date(date), duration, toolName, compression, downtime, rawSize, compressedSize, img)
     this.backups.unshift(obj)
     this.flushToDrive()
   }
 
   getBackups(): BackupDto[] {
-    return this.backups.map(({ date, toolName, duration }) => ({ date: date.getTime(), toolName, duration }))
+    return this.backups.map(({ date, ...rest }) => ({ date: date.getTime(), ...rest }))
   }
 
   getLastBackupTime(toolName: string): number | undefined {

@@ -1,14 +1,29 @@
 <div class="card h-100">
-  <img [src]="'assets/icons/overleaf.svg'" class="card-img-top" alt="..." />
+  <div class="img-container">
+    <img [src]="'assets/icons/' + backup.img" class="card-img-top" alt="..." />
+  </div>
   <div class="card-body">
     <ul class="list-group list-group-flush">
       <li class="list-group-item">
-        <h5 class="card-title">Overleaf</h5>
+        <h5 class="card-title">
+          {{ backup.toolName }}<span class="right text-muted">{{ backup.date | date: 'd.M.yyyy, HH:mm' }}</span>
+        </h5>
       </li>
-      <li class="list-group-item">Status: <span class="badge bg-success text-light">Online</span></li>
-      <li class="list-group-item">Status: <span class="badge bg-success text-light">Online</span></li>
-      <li class="list-group-item">Status: <span class="badge bg-success text-light">Online</span></li>
-      <li class="list-group-item">Status: <span class="badge bg-success text-light">Online</span></li>
+      <li class="list-group-item">
+        Downtime: <span class="right">{{ backup.downtime | time }}</span>
+      </li>
+      <li class="list-group-item">
+        Kompression: <span class="right">{{ backup.compression | time }}</span>
+      </li>
+      <li class="list-group-item">
+        Insgesamt: <span class="right">{{ backup.duration | time }}</span>
+      </li>
+      <li class="list-group-item">
+        Größe (raw): <span class="right">{{ backup.rawSize }}</span>
+      </li>
+      <li class="list-group-item">
+        Größe (compressed): <span class="right">{{ backup.compressedSize }}</span>
+      </li>
     </ul>
   </div>
 </div>

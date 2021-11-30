@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core'
 import { StorageDto } from '@dashy/api-interfaces'
 
 @Component({
@@ -7,11 +7,7 @@ import { StorageDto } from '@dashy/api-interfaces'
   styleUrls: ['./storage-bar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StorageBarComponent implements OnInit {
+export class StorageBarComponent {
   @Input()
   storage: StorageDto | null
-
-  constructor() {}
-
-  ngOnInit(): void {}
 }

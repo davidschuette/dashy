@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { ToolDto } from '@dashy/api-interfaces'
 import { Observable, of } from 'rxjs'
 import { DashboardService } from '../../services/dashboard.service'

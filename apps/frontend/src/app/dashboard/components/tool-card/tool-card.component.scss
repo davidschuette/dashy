@@ -1,7 +1,11 @@
 :host {
   display: block;
   box-shadow: 2px 2px 5px grey;
-  background-repeat: 0.25em;
+  border-radius: 0.25em;
+
+  h5 {
+    font-weight: bold;
+  }
 }
 
 .badge {

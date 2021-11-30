@@ -29,9 +29,23 @@ export class StorageDto {
 export class BackupDto {
   date: number
   duration: number
+  compression: number
+  downtime: number
+  rawSize: string
+  compressedSize: string
   toolName: string
+  img: string
 }
 
 export class Backup {
-  constructor(public date: Date, public duration: number, public toolName: string) {}
+  constructor(
+    public date: Date,
+    public duration: number,
+    public toolName: string,
+    public compression: number,
+    public downtime: number,
+    public rawSize: string,
+    public compressedSize: string,
+    public img: string
+  ) {}
 }

@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core'
-import { HttpClient } from '@angular/common/http'
-import { DashboardService } from './dashboard/services/dashboard.service'
-import { Observable, of } from 'rxjs'
 import { StorageDto } from '@dashy/api-interfaces'
+import { Observable } from 'rxjs'
+import { DashboardService } from './dashboard/services/dashboard.service'
 
 @Component({
   selector: 'dashy-root',

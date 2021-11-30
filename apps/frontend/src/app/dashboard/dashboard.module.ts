@@ -6,13 +6,14 @@ import { StorageBarComponent } from './components/storage-bar/storage-bar.compon
 import { DashboardService } from './services/dashboard.service'
 import { HttpClientModule } from '@angular/common/http'
 import { PageComponent } from './containers/page/page.component'
-import { TimeDiffPipe } from '../pipes/time-diff.pipe';
-import { BackupComponent } from './containers/backup/backup.component';
+import { TimeDiffPipe } from '../pipes/time-diff.pipe'
+import { BackupComponent } from './containers/backup/backup.component'
 import { BackupCardComponent } from './components/backup-card/backup-card.component'
+import { TimePipe } from '../pipes/time.pipe'
 
 @NgModule({
   providers: [DashboardService],
-  declarations: [ToolCardComponent, ToolCardGalleryComponent, StorageBarComponent, PageComponent, TimeDiffPipe, BackupComponent, BackupCardComponent],
+  declarations: [ToolCardComponent, ToolCardGalleryComponent, StorageBarComponent, PageComponent, TimeDiffPipe, TimePipe, BackupComponent, BackupCardComponent],
   imports: [CommonModule, HttpClientModule],
   exports: [PageComponent],
 })

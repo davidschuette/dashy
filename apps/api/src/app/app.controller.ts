@@ -34,6 +34,7 @@ export class AppController {
 
   @Post('backups')
   createBackup(@Body() data: BackupDto) {
+    console.log(data)
     return this.backupService.createBackup(data)
   }
 
