@@ -11,7 +11,7 @@ export const environment: EnvironmentModel = {
       archiveName: 'overleaf.tar.gz',
       basePath: '/home/dave/deployment',
       folderName: 'overleaf',
-      cron: '* 0 4 * * 0,2,4,6', // Every second weekday at 04:00 am
+      cron: '0 0 4 * * 0,2,4,6', // Every second weekday at 04:00 am
       img: 'overleaf.svg',
       commands: {
         start: 'cd /home/dave/deployment/overleaf && docker-compose up -d',
@@ -23,7 +23,7 @@ export const environment: EnvironmentModel = {
       archiveName: 'nextcloud.tar.gz',
       basePath: '/home/dave/deployment',
       folderName: 'nextcloud',
-      cron: '* 0 4 * * *', // Every weekday at 05:00 am
+      cron: '0 0 4 * * *', // Every weekday at 05:00 am
       img: 'nextcloud.svg',
       commands: {
         start: 'cd /home/dave/deployment/nextcloud && docker-compose up -d',
@@ -34,7 +34,7 @@ export const environment: EnvironmentModel = {
       archiveName: 'send.tar.gz',
       basePath: '/home/dave/deployment',
       folderName: 'send',
-      cron: '* 0 4 * * 1,3,5', // Every second weekday at 04:00 am
+      cron: '0 0 4 * * 1,3,5', // Every second weekday at 04:00 am
       img: 'send.svg',
       toolName: 'Send',
       commands: {
