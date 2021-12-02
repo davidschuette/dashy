@@ -33,12 +33,11 @@ export class AppService implements OnModuleInit {
   }
 
   syncFolder(folderName: string, basePath: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const command = exec(`rsync --delete -az ${environment.sshBase}:${basePath}/${folderName}/ ${environment.storage}${folderName}/`)
 
-      command.on('error', (err) => {
+      command.stderr.on('data', (err) => {
         console.error(err)
-        reject()
       })
 
       command.on('exit', () => {
@@ -48,12 +47,11 @@ export class AppService implements OnModuleInit {
   }
 
   executeRemoteCommand(name: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const command = exec(`ssh ${environment.sshBase} '${name}'`)
 
-      command.on('error', (err) => {
+      command.stderr.on('data', (err) => {
         console.error(err)
-        reject()
       })
 
       command.on('exit', () => {
@@ -63,13 +61,12 @@ export class AppService implements OnModuleInit {
   }
 
   async getRawSizeOfBackup(tool: ToolBackup): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const command = exec(`du -hs ${environment.storage}${tool.folderName} | awk '{ print $1 }'`)
       let result = ''
 
-      command.on('error', (err) => {
+      command.stderr.on('data', (err) => {
         console.error(err)
-        reject()
       })
 
       command.stdout.on('data', (chunk) => (result += chunk))
@@ -81,13 +78,12 @@ export class AppService implements OnModuleInit {
   }
 
   async getCompressedSizeOfBackup(tool: ToolBackup): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const command = exec(`ls -lh ${environment.storage}${tool.archiveName} | awk '{ print $5 }'`)
       let result = ''
 
-      command.on('error', (err) => {
+      command.stderr.on('data', (err) => {
         console.error(err)
-        reject()
       })
 
       command.stdout.on('data', (chunk) => (result += chunk))
@@ -144,9 +140,8 @@ export class AppService implements OnModuleInit {
     return new Promise((resolve, reject) => {
       const command = exec(`tar -cz ${environment.storage}${tool.folderName} -f ${environment.storage}${tool.archiveName}`)
 
-      command.on('error', (err) => {
+      command.stderr.on('data', (err) => {
         console.error(err)
-        reject()
       })
 
       command.on('exit', () => {
