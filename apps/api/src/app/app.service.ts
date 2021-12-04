@@ -5,86 +5,29 @@ import { AccountCreation, StorageDto, ToolDto, ToolStatus } from '@dashy/api-int
 import { exec } from 'child_process'
 import { readFileSync, writeFileSync } from 'fs'
 import { BackupService } from './backup/backup.service'
+import { environment } from '../environments/environment'
+import { Tool } from './models/tool.model'
+import { LogService } from '@dashy/util/logger'
 
 @Injectable()
 export class AppService {
-  private readonly STORAGE_PATH = 'tools.json'
-  private tools = [
-    {
-      name: 'Overleaf',
-      description:
-        'Overleaf ist ein online LaTeX Kollaborationstool. Es ist keine Installation erforderlich. Zudem gibt es einen vollständigen Änderungsverlauf.',
-      url: 'https://overleaf.lyop.de',
-      img: 'overleaf.svg',
-      containerNames: ['sharelatex', 'redis', 'mongo'],
-      accountCreation: AccountCreation.ON_REQUEST,
-      isInMaintenance: false,
-    },
-    {
-      name: 'Nextcloud',
-      description: `Nextcloud ist eine Software für das Speichern von Daten (Filehosting).
-Bei Einsatz eines Clients wird der Server automatisch mit einem lokalen Verzeichnis synchronisiert. Dadurch kann von mehreren Rechnern, aber auch über eine Weboberfläche, auf einen konsistenten Datenbestand zugegriffen werden.
-Ebenfalls sind Videokonferenzen und das „Teilen“ des eigenen Bildschirms möglich. Alle Daten auf der Nextcloud sind End-to-End verschlüsselt. Mit Nextcloud behält der Besitzer die vollständige Kontrolle über seine Daten, und Möglichkeiten für Datenmissbrauch werden reduziert.`,
-      url: 'https://next.lyop.de',
-      img: 'nextcloud.svg',
-      containerNames: ['nextcloud_app_1', 'nextcloud_db_1'],
-      accountCreation: AccountCreation.ON_REQUEST,
-      isInMaintenance: false,
-    },
-    {
-      name: 'Send',
-      description: `Mit Send kannst du Dateien sicher mit anderen teilen – mit End-to-End-Verschlüsselung und einem Freigabe-Link, der automatisch abläuft.
-So bleiben deine geteilten Inhalte privat und du kannst sicherstellen, dass deine Daten nicht für immer im Web herumschwirren.`,
-      url: 'https://send.lyop.de',
-      img: 'send.svg',
-      containerNames: ['send_send_1', 'send_redis_1'],
-      accountCreation: AccountCreation.NO_ACCOUNT,
-      isInMaintenance: false,
-    },
-    {
-      name: 'BitWarden',
-      description:
-        'BitWarden ist ein online Password-Manager. Es gibt Clients für alle gängien Geräte. Alle Passwörter werden zwischen den Geräten synchronisiert.',
-      url: 'https://bitwarden.lyop.de',
-      img: 'bitwarden.svg',
-      containerNames: [
-        'bitwarden-nginx',
-        'bitwarden-admin',
-        'bitwarden-portal',
-        'bitwarden-attachments',
-        'bitwarden-web',
-        'bitwarden-mssql',
-        'bitwarden-sso',
-        'bitwarden-events',
-        'bitwarden-identity',
-        'bitwarden-icons',
-        'bitwarden-api',
-        'bitwarden-notifications',
-      ],
-      accountCreation: AccountCreation.SELF,
-      isInMaintenance: false,
-    },
-    {
-      name: 'Plex',
-      description: 'Filme und Serien, die es sonst nirgends gibt.',
-      url: 'https://plex.lyop.de',
-      img: 'plex.png',
-      containerNames: [],
-      accountCreation: AccountCreation.ON_REQUEST,
-      isInMaintenance: false,
-    },
-  ]
+  private tools: Tool[]
 
-  constructor(private readonly http: HttpService, private readonly backupService: BackupService) {
+  constructor(private readonly http: HttpService, private readonly backupService: BackupService, private readonly logger: LogService) {
     this.loadFromDrive()
   }
 
   private loadFromDrive() {
-    this.tools = JSON.parse(readFileSync(this.STORAGE_PATH).toString())
+    try {
+      this.tools = JSON.parse(readFileSync(environment.storage.tools).toString())
+    } catch (e) {
+      this.logger.warn(`Could not load file '${environment.storage.tools}', initialising with initTools from configuration`)
+      this.tools = environment.initTools
+    }
   }
 
   private flushToDrive() {
-    writeFileSync(this.STORAGE_PATH, JSON.stringify(this.tools))
+    writeFileSync(environment.storage.tools, JSON.stringify(this.tools))
   }
 
   async getTools(): Promise<ToolDto[]> {

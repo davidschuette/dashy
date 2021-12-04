@@ -247,6 +247,29 @@
       },
       "tags": [],
       "implicitDependencies": ["frontend"]
+    },
+    "util-logger": {
+      "root": "libs/util/logger",
+      "sourceRoot": "libs/util/logger/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/util/logger/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/util/logger"],
+          "options": {
+            "jestConfig": "libs/util/logger/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
     }
   }
 }

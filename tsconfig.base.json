@@ -16,7 +16,8 @@
     "strictPropertyInitialization": false,
     "baseUrl": ".",
     "paths": {
-      "@dashy/api-interfaces": ["libs/api-interfaces/src/index.ts"]
+      "@dashy/api-interfaces": ["libs/api-interfaces/src/index.ts"],
+      "@dashy/util/logger": ["libs/util/logger/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

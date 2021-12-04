@@ -1,5 +1,6 @@
-import { BackupDto } from '@dashy/api-interfaces'
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
+import { BackupDto, StorageDto, ToolDto } from '@dashy/api-interfaces'
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common'
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { AppService } from './app.service'
 import { BackupService } from './backup/backup.service'
 
@@ -13,32 +14,42 @@ export class AppController {
   }
 
   @Get('tools')
-  getTools() {
+  @ApiTags('Tools')
+  @ApiOkResponse({ type: ToolDto, isArray: true })
+  getTools(): Promise<ToolDto[]> {
     return this.appService.getTools()
   }
 
   @Get('storage')
-  getStorage() {
+  @ApiTags('Storage')
+  @ApiOkResponse({ type: StorageDto })
+  getStorage(): Promise<StorageDto> {
     return this.appService.getStorage()
   }
 
   @Post('tools/:toolName/maintenance')
-  setMaintenanceStatus(@Param('toolName') toolName: string) {
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiTags('Tools')
+  setMaintenanceStatus(@Param('toolName') toolName: string): void {
     return this.appService.setMaintenanceStatus(toolName)
   }
 
   @Delete('tools/:toolName/maintenance')
-  clearMaintenanceStatus(@Param('toolName') toolName: string) {
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiTags('Tools')
+  clearMaintenanceStatus(@Param('toolName') toolName: string): void {
     return this.appService.clearMaintenanceStatus(toolName)
   }
 
   @Post('backups')
-  createBackup(@Body() data: BackupDto) {
-    console.log(data)
+  @ApiTags('Backups')
+  createBackup(@Body() data: BackupDto): void {
     return this.backupService.createBackup(data)
   }
 
   @Get('backups')
+  @ApiTags('Backups')
+  @ApiOkResponse({ type: BackupDto, isArray: true })
   getBackups(): BackupDto[] {
     return this.backupService.getBackups()
   }

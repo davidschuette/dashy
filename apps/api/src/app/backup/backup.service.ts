@@ -2,10 +2,10 @@ import { Backup, BackupDto } from '@dashy/api-interfaces'
 import { HttpService } from '@nestjs/axios'
 import { Injectable } from '@nestjs/common'
 import { readFileSync, writeFileSync } from 'fs'
+import { environment } from '../../environments/environment'
 
 @Injectable()
 export class BackupService {
-  private readonly STORAGE_PATH = 'backups.json'
   private backups: Backup[] = []
 
   constructor(private readonly http: HttpService) {
@@ -13,14 +13,14 @@ export class BackupService {
   }
 
   private loadFromDrive() {
-    this.backups = (JSON.parse(readFileSync(this.STORAGE_PATH).toString()) as BackupDto[]).map(({ date, ...rest }) => ({
+    this.backups = (JSON.parse(readFileSync(environment.storage.backups).toString()) as BackupDto[]).map(({ date, ...rest }) => ({
       date: new Date(date),
       ...rest,
     }))
   }
 
   private flushToDrive() {
-    writeFileSync(this.STORAGE_PATH, JSON.stringify(this.backups))
+    writeFileSync(environment.storage.backups, JSON.stringify(this.backups))
   }
 
   createBackup({ date, downtime, compressedSize, compression, duration, img, rawSize, toolName }: BackupDto) {
