@@ -49,7 +49,7 @@ services:
 
   api:
     container_name: dashy_api
-    image: registry.lyop.de/dashy-api:1.0.0
+    image: dashy-api:local
     build:
       context: .
       dockerfile: apps/api/Dockerfile
@@ -66,7 +66,7 @@ services:
 
   frontend:
     container_name: dashy_frontend
-    image: registry.lyop.de/dashy-frontend:1.0.0
+    image: dashy-frontend:local
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
@@ -80,11 +80,12 @@ services:
 
   backup:
     container_name: dashy_backup
-    image: registry.lyop.de/dashy-backup:1.0.0
+    image: dashy-backup:local
     build:
       context: .
       dockerfile: apps/backup/Dockerfile
     restart: always
+    ports:
+      - 3334:3334
     volumes:
       - ./data:/usr/src/data
-
