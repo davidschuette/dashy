@@ -1,10 +1,10 @@
 import { Tool } from '../app/models/tool.model'
 
 export interface EnvironmentModel {
-  production: boolean
-  storage: {
-    backups: string
-    tools: string
+  readonly production: boolean
+  readonly storage: {
+    readonly backups: string
+    readonly tools: string
   }
-  initTools: Tool[]
+  readonly initTools: Tool[]
 }
