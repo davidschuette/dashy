@@ -49,6 +49,9 @@
             "jestConfig": "apps/api/jest.config.js",
             "passWithNoTests": true
           }
+        },
+        "version": {
+          "builder": "@jscutlery/semver:version"
         }
       },
       "tags": []
@@ -116,6 +119,9 @@
             "jestConfig": "apps/backup/jest.config.js",
             "passWithNoTests": true
           }
+        },
+        "version": {
+          "builder": "@jscutlery/semver:version"
         }
       },
       "tags": []
@@ -207,6 +213,9 @@
             "jestConfig": "apps/frontend/jest.config.js",
             "passWithNoTests": true
           }
+        },
+        "version": {
+          "builder": "@jscutlery/semver:version"
         }
       },
       "tags": []
