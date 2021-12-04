@@ -1,6 +1,6 @@
 import { BackupDto } from '@dashy/api-interfaces'
 import { HttpService } from '@nestjs/axios'
-import { Injectable, OnModuleInit } from '@nestjs/common'
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common'
 import { SchedulerRegistry } from '@nestjs/schedule'
 import { exec } from 'child_process'
 import { CronJob } from 'cron'
@@ -92,6 +92,16 @@ export class AppService implements OnModuleInit {
         resolve(result.replace('\n', ''))
       })
     })
+  }
+
+  triggerBackup(toolName: string) {
+    const tool = environment.backups.find((_) => _.toolName === toolName)
+
+    if (!tool) {
+      throw new NotFoundException('ToolNotFound')
+    }
+
+    this.backupTool(tool)
   }
 
   async backupTool(tool: ToolBackup) {
