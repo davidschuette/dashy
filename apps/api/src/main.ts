@@ -17,7 +17,15 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix)
   app.enableShutdownHooks()
 
-  const config = new DocumentBuilder().setTitle('Dashy Api').setDescription('Api').setVersion('1.0').addTag('Tools').addTag('Storage').addTag('Backups').build()
+  const config = new DocumentBuilder()
+    .setTitle('Dashy Api')
+    .setDescription('Api')
+    .setVersion('1.0')
+    .addTag('Tools')
+    .addTag('Storage')
+    .addTag('Backups')
+    .addBearerAuth({ type: 'http', scheme: 'bearer' })
+    .build()
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup(globalPrefix, app, document)
 

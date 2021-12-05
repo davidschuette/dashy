@@ -1,10 +1,10 @@
-import { CronExpression } from '@nestjs/schedule'
 import { EnvironmentModel } from './model'
 
 export const environment: EnvironmentModel = {
   production: false,
-  apiPath: '/api/',
-  sshBase: 'omnikron@lyop.de',
+  apiPath: 'http://localhost:3333/api/',
+  apiAuthenticationKey: 'local',
+  sshBase: '',
   storage: './data/',
   backups: [
     {
