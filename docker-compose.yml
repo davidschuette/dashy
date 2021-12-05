@@ -11,6 +11,8 @@ services:
     restart: always
     networks:
       - dashy-net
+    depends_on:
+      - prometheus
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
@@ -21,6 +23,8 @@ services:
     restart: always
     networks:
       - dashy-net
+    ports:
+      - 9090:9090
     volumes:
       - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./deployment/prometheus_data:/prometheus

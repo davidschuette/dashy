@@ -7,4 +7,5 @@ export interface EnvironmentModel {
     readonly tools: string
   }
   readonly initTools: Tool[]
+  readonly prometheusHost: string
 }

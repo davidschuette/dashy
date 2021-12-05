@@ -8,4 +8,5 @@ export const environment: EnvironmentModel = {
     tools: 'tools.json',
   },
   initTools: [],
+  prometheusHost: 'prometheus:9090',
 }

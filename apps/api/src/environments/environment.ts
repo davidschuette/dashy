@@ -7,4 +7,5 @@ export const environment: EnvironmentModel = {
     tools: './deployment/api_data/tools.json',
   },
   initTools: [],
+  prometheusHost: 'localhost:9090',
 }

@@ -1,13 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { StorageDto, ToolDto, ToolStatus } from '@dashy/api-interfaces'
+import { LogService } from '@dashy/util/logger'
 import { HttpService } from '@nestjs/axios'
-import { firstValueFrom, map } from 'rxjs'
-import { AccountCreation, StorageDto, ToolDto, ToolStatus } from '@dashy/api-interfaces'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { exec } from 'child_process'
 import { readFileSync, writeFileSync } from 'fs'
-import { BackupService } from './backup/backup.service'
+import { firstValueFrom, map } from 'rxjs'
 import { environment } from '../environments/environment'
+import { BackupService } from './backup/backup.service'
 import { Tool } from './models/tool.model'
-import { LogService } from '@dashy/util/logger'
 
 @Injectable()
 export class AppService {
@@ -47,7 +47,7 @@ export class AppService {
               value: [number, '1' | '0']
             }[]
           }
-        }>('http://prometheus:9090/api/v1/query?query=docker_container_running_state')
+        }>(`http://${environment.prometheusHost}/api/v1/query?query=docker_container_running_state`)
         .pipe(map((_) => _.data.data.result))
     )
 
@@ -91,7 +91,7 @@ export class AppService {
             value: [number, number]
           }[]
         }
-      }>('http://prometheus:9090/api/v1/query?query=docker_container_running_state')
+      }>(`http://${environment.prometheusHost}/api/v1/query?query=docker_container_running_state`)
       .pipe(map((_) => _.data.data.result))
   }
 
