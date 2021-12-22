@@ -92,4 +92,4 @@ services:
     ports:
       - 3334:3334
     volumes:
-      - ./data:/usr/src/data
+      - ./deployment/backup_data:/usr/src/data

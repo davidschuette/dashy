@@ -5,6 +5,7 @@ export class ToolBackup {
   archiveName: string
   basePath: string
   cron: string
+  maxNumberOfVersions: number
   commands?: {
     start: string
     stop: string
