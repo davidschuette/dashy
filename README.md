@@ -1,105 +1,27 @@
-
-
 # Dashy
 
-This project was generated using [Nx](https://nx.dev).
+Dashy is a monorepo consisting of three different apps ([frontend](#apps-frontend), [api](#apps-api), [backup](#apps-backup)). These apps provide an infrastructure around a server with multiple self-hosted tool subdomains.
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+## Apps
 
-🔎 **Smart, Extensible Build Framework**
+<!----><a name="apps-frontend"></a>
 
-## Quick Start & Documentation
+### Frontend
 
-[Nx Documentation](https://nx.dev/angular)
+The frontend app provides a dashboard with an overview of the different tools. Each card includes a small description, a `ONLINE`/`OFFLINE` status and a link to the specific tool.
 
-[10-minute video showing all Nx features](https://nx.dev/getting-started/intro)
+Additionally, there is a storage bar representing the remaining storage space on the server.
 
-[Interactive Tutorial](https://nx.dev/tutorial/01-create-application)
+Below that, a list of the most recent backup reports can be found. More on this [here](#apps-backup).
 
-## Adding capabilities to your workspace
+<!----><a name="apps-api"></a>
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+### API
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+The API provides required data for the frontend (e.g. list of tools) and gathers backup reports.
 
-Below are our core plugins:
+<!----><a name="apps-backup"></a>
 
-- [Angular](https://angular.io)
-  - `ng add @nrwl/angular`
-- [React](https://reactjs.org)
-  - `ng add @nrwl/react`
-- Web (no framework frontends)
-  - `ng add @nrwl/web`
-- [Nest](https://nestjs.com)
-  - `ng add @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `ng add @nrwl/express`
-- [Node](https://nodejs.org)
-  - `ng add @nrwl/node`
+### Backup
 
-There are also many [community plugins](https://nx.dev/community) you could add.
-
-## Generate an application
-
-Run `ng g @nrwl/angular:app my-app` to generate an application.
-
-> You can use any of the plugins above to generate applications as well.
-
-When using Nx, you can create multiple applications and libraries in the same workspace.
-
-## Generate a library
-
-Run `ng g @nrwl/angular:lib my-lib` to generate a library.
-
-> You can also use any of the plugins above to generate libraries as well.
-
-Libraries are shareable across libraries and applications. They can be imported from `@dashy/mylib`.
-
-## Development server
-
-Run `ng serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng g component my-component --project=my-app` to generate a new component.
-
-## Build
-
-Run `ng build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test my-app` to execute the unit tests via [Jest](https://jestjs.io).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx dep-graph` to see a diagram of the dependencies of your projects.
-
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev/angular) to learn more.
-
-
-
-
-
-
-## ☁ Nx Cloud
-
-### Distributed Computation Caching & Distributed Task Execution
-
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
-
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
+The backup service can be configured with different backup targets. The basic principle is an offsite backup server running this service. Files are downloaded using `rsync` and then compressed to a `.tar.gz` archive. Backups are triggered by a cron expression.
