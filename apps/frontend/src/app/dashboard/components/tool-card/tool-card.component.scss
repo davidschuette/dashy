@@ -1,7 +1,7 @@
 :host {
   display: block;
   box-shadow: 2px 2px 5px grey;
-  border-radius: 0.25em;
+  border-radius: 0.5em;
 
   h5 {
     font-weight: bold;
@@ -16,6 +16,10 @@ img {
   height: 15em;
   width: 100%;
   object-fit: contain;
+}
+
+.card {
+  border-radius: 0.5em;
 }
 
 .card-body {

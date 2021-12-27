@@ -1,5 +1,38 @@
 :host {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1em;
+  grid-template-columns: 30% 60%;
+  background-color: #fff;
+  border-radius: 0.5em;
+  box-shadow: 2px 2px 5px grey;
+
+  .left {
+    border-right: 1px solid #dfdfdf;
+    list-style-type: none;
+    margin: 0;
+
+    .tool-item {
+      display: flex;
+      grid-template-columns: auto 1fr;
+      border-bottom: 1px solid #dfdfdf;
+      padding: 1em;
+      cursor: pointer;
+
+      img {
+        width: 5em;
+      }
+
+      .title {
+        font-weight: bold;
+        font-size: 1.2em;
+        display: flex;
+        vertical-align: middle;
+        align-items: center;
+      }
+    }
+  }
+}
+
+.right {
+  height: 50vh;
+  overflow: auto;
 }

@@ -1,19 +1,23 @@
-import { Component, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core'
 import { BackupDto } from '@dashy/api-interfaces'
-import { Observable } from 'rxjs'
-import { DashboardService } from '../../services/dashboard.service'
 
 @Component({
   selector: 'dashy-backup',
   templateUrl: './backup.component.html',
   styleUrls: ['./backup.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BackupComponent implements OnInit {
-  backups$: Observable<BackupDto[]>
+  @Input()
+  backups: { [k: string]: BackupDto[] }
+  readonly oKeys = Object.keys
+  selectedTool: string
 
-  constructor(private readonly dashboardService: DashboardService) {}
+  constructor() {}
 
-  ngOnInit() {
-    this.backups$ = this.dashboardService.getBackups()
+  ngOnInit() {}
+
+  showTool(toolName: string) {
+    this.selectedTool = toolName
   }
 }

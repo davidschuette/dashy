@@ -2,8 +2,7 @@ div.card {
   display: grid;
   grid-template-rows: 1fr;
   grid-template-columns: 10em 1fr;
-  box-shadow: 2px 2px 5px grey;
-  border-radius: 0.25em;
+  border-radius: 0;
 
   h5 {
     font-weight: bold;

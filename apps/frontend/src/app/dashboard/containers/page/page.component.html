@@ -14,5 +14,5 @@
 
 <div class="content">
   <h1>Backups</h1>
-  <dashy-backup></dashy-backup>
+  <dashy-backup [backups]="(backups$ | async) || {}"></dashy-backup>
 </div>

@@ -1,1 +1,9 @@
-<dashy-backup-card *ngFor="let backup of backups$ | async" [backup]="backup"></dashy-backup-card>
+<ul class="left">
+  <li class="tool-item" *ngFor="let backup of oKeys(backups || {})" (click)="showTool(backup)">
+    <img attr.src="assets/icons/{{ (backups || {})[backup][0].img }}" alt="" />
+    <div class="title">{{ backup }}</div>
+  </li>
+</ul>
+<div class="right">
+  <dashy-backup-card *ngFor="let item of (backups || {})[selectedTool]" [backup]="item"></dashy-backup-card>
+</div>
