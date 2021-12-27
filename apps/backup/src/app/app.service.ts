@@ -1,26 +1,39 @@
 import { BackupDto } from '@dashy/api-interfaces'
+import { LogService } from '@dashy/util/logger'
 import { HttpService } from '@nestjs/axios'
 import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common'
 import { SchedulerRegistry } from '@nestjs/schedule'
 import { exec } from 'child_process'
 import { CronJob } from 'cron'
+import { readdir, rm } from 'fs/promises'
 import { join } from 'path'
 import { firstValueFrom } from 'rxjs'
+import { URL } from 'url'
 import { environment } from '../environments/environment'
 import { ToolBackup } from './models/tool-backup'
-import { LogService } from '@dashy/util/logger'
-import { readdir, rm } from 'fs/promises'
-import { URL } from 'url'
 
 @Injectable()
 export class AppService implements OnModuleInit {
   private readonly FILE_NAME_PATTERN =
-    /^([a-zA-Z]+)_([0-9]{4}-(01|02|03|04|05|06|07|08|09|10|11|12)-(01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31)T(0[0-9]|1[0-9]|20|21|22|23):([0-5][0-9]):([0-5][0-9]).[0-9]{3})Z\.tar\.gz$/
+    /^([a-zA-Z0-9]+)_([0-9]{4}-(01|02|03|04|05|06|07|08|09|10|11|12)-(01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31)T(0[0-9]|1[0-9]|20|21|22|23):([0-5][0-9]):([0-5][0-9]).[0-9]{3})Z\.tar\.gz$/
 
-  constructor(private readonly http: HttpService, private readonly schedulerRegistry: SchedulerRegistry, private readonly logger: LogService) {}
+  constructor(private readonly http: HttpService, private readonly schedulerRegistry: SchedulerRegistry, private readonly logger: LogService) {
+    if (!environment.backups.every((_) => _.archiveName.match(/^[a-zA-Z0-9]+$/))) {
+      throw new Error(
+        `ArchiveNames '${environment.backups
+          .map((_) => _.archiveName)
+          .filter((_) => !_.match(/^[a-zA-Z0-9]+$/))
+          .join(', ')}' does not meet regex /^[a-zA-Z0-9]+$/`
+      )
+    }
+  }
 
   onModuleInit() {
     if (environment.production) {
+      if (environment.backups.length === 0) {
+        this.logger.warn(`No backup jobs set up.`)
+      }
+
       this.initialiseBackupCronJobs()
     } else {
       this.logger.debug('Skipping cron initialisation due to development mode.')
@@ -32,14 +45,8 @@ export class AppService implements OnModuleInit {
 
     return files
       .filter((_) => _.startsWith(archiveName + '_') && this.FILE_NAME_PATTERN.test(_))
-      .map((_) => {
-        return { name: _, date: new Date(_.match(this.FILE_NAME_PATTERN)[2]) }
-      })
+      .map((_) => ({ name: _, date: new Date(_.match(this.FILE_NAME_PATTERN)[2]) }))
       .sort((a, b) => b.date.getTime() - a.date.getTime())
-  }
-
-  getAmountOfBackups(tool: ToolBackup): Promise<number> {
-    return this.getBackupFiles(tool).then((_) => _.length)
   }
 
   async deleteBackupFiles(tool: ToolBackup) {
@@ -52,10 +59,11 @@ export class AppService implements OnModuleInit {
       this.logger.log(
         `Removed ${files.length - tool.maxNumberOfVersions} overhanging version${files.length - tool.maxNumberOfVersions === 1 ? '' : 's'} of tool '${
           tool.toolName
-        }'`
+        }'`,
+        `BackupJob.${tool.toolName}`
       )
     } else {
-      this.logger.debug(`No files to delete for tool '${tool.toolName}'`)
+      this.logger.debug(`No files to delete for tool '${tool.toolName}'`, `BackupJob.${tool.toolName}`)
     }
   }
 
@@ -77,7 +85,9 @@ export class AppService implements OnModuleInit {
 
   syncFolder(folderName: string, basePath: string): Promise<void> {
     return new Promise((resolve) => {
-      const command = exec(`rsync --delete -az ${environment.sshBase}:${join(basePath, folderName, '/')} ${join(environment.storage, folderName, '/')}`)
+      const folderPath = join(environment.storage, folderName, '/')
+
+      const command = exec(`rsync --delete -az ${environment.sshBase}:${join(basePath, folderName, '/')} ${folderPath}`)
 
       command.stderr.on('data', (err) => {
         this.logger.error(err, 'AppService.syncFolder')
@@ -103,9 +113,9 @@ export class AppService implements OnModuleInit {
     })
   }
 
-  async getRawSizeOfBackup(tool: ToolBackup): Promise<string> {
+  async getRawSizeOfBackup(fileName: string): Promise<string> {
     return new Promise((resolve) => {
-      const command = exec(`du -hs ${join(environment.storage, tool.folderName)} | awk '{ print $1 }'`)
+      const command = exec(`du -hs ${join(environment.storage, fileName)} | awk '{ print $1 }'`)
       let result = ''
 
       command.stderr.on('data', (err) => {
@@ -120,9 +130,9 @@ export class AppService implements OnModuleInit {
     })
   }
 
-  async getCompressedSizeOfBackup(tool: ToolBackup): Promise<string> {
+  async getCompressedSizeOfBackup(fileName: string): Promise<string> {
     return new Promise((resolve) => {
-      const command = exec(`ls -lh ${join(environment.storage, tool.archiveName)} | awk '{ print $5 }'`)
+      const command = exec(`ls -lh ${join(environment.storage, fileName)} | awk '{ print $5 }'`)
       let result = ''
 
       command.stderr.on('data', (err) => {
@@ -150,34 +160,34 @@ export class AppService implements OnModuleInit {
   async backupTool(tool: ToolBackup) {
     const time = Date.now()
 
-    this.logger.log(`Starting backup ${tool.folderName}`)
+    this.logger.log(`Starting backup ${tool.folderName}`, `BackupJob.${tool.toolName}`)
 
     if (tool.commands) {
       await this.setMaintenanceStatus(tool.toolName)
       await this.executeRemoteCommand(tool.commands.stop)
 
-      this.logger.log(`Stopped ${tool.folderName}`)
+      this.logger.log(`Stopped ${tool.folderName}`, `BackupJob.${tool.toolName}`)
     } else {
-      this.logger.debug(`No commands ${tool.folderName}`)
+      this.logger.debug(`No commands ${tool.folderName}`, `BackupJob.${tool.toolName}`)
     }
 
     await this.syncFolder(tool.folderName, tool.basePath)
-    this.logger.log(`Synced folder ${tool.folderName}`)
+    this.logger.log(`Synced folder ${tool.folderName}`, `BackupJob.${tool.toolName}`)
 
     if (tool.commands) {
       await this.executeRemoteCommand(tool.commands.start)
-      this.logger.log(`Restarted ${tool.folderName}`)
+      this.logger.log(`Restarted ${tool.folderName}`, `BackupJob.${tool.toolName}`)
       await this.clearMaintenanceStatus(tool.toolName)
     }
 
     const downtime = Date.now() - time
 
-    await this.createArchive(tool)
+    const fileName = await this.createArchive(tool)
     const diff = Date.now() - time
 
-    this.logger.log(`Archived ${tool.folderName} in ${diff}ms`)
+    this.logger.log(`Archived ${tool.folderName} in ${diff}ms`, `BackupJob.${tool.toolName}`)
 
-    const [rawSize, compressedSize] = await Promise.all([this.getRawSizeOfBackup(tool), this.getCompressedSizeOfBackup(tool)])
+    const [rawSize, compressedSize] = await Promise.all([this.getRawSizeOfBackup(fileName), this.getCompressedSizeOfBackup(fileName)])
 
     await this.deleteBackupFiles(tool)
 
@@ -193,21 +203,20 @@ export class AppService implements OnModuleInit {
     })
   }
 
-  createArchive(tool: ToolBackup): Promise<void> {
+  /*
+   * @returns file name
+   */
+  createArchive(tool: ToolBackup): Promise<string> {
     return new Promise((resolve) => {
-      const command = exec(
-        `tar -c --use-compress-program=pigz ${join(environment.storage, tool.folderName)} -f ${join(
-          environment.storage,
-          tool.archiveName
-        )}_${new Date().toJSON()}.tar.gz`
-      )
+      const fileName = `${tool.archiveName}_${new Date().toJSON()}.tar.gz`
+      const command = exec(`tar -c --use-compress-program=pigz ${join(environment.storage, tool.folderName)} -f ${join(environment.storage, fileName)}`)
 
       command.stderr.on('data', (err) => {
         this.logger.error(err)
       })
 
       command.on('exit', () => {
-        resolve()
+        resolve(fileName)
       })
     })
   }
