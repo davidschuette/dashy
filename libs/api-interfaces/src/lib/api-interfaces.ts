@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+// import { ApiProperty } from '@nestjs/swagger'
 
 export enum ToolStatus {
   ONLINE,
@@ -14,59 +14,59 @@ export enum AccountCreation {
 }
 
 export class ToolDto {
-  @ApiProperty()
+  // @ApiProperty()
   name: string
 
-  @ApiProperty()
+  // @ApiProperty()
   description: string
 
-  @ApiProperty({ enum: ToolStatus })
+  // @ApiProperty({ enum: ToolStatus })
   status: ToolStatus
 
-  @ApiProperty()
+  // @ApiProperty()
   url: string
 
-  @ApiProperty({ description: 'Path to image for tool, is relative to assets/icons folder in frontend.' })
+  // @ApiProperty({ description: 'Path to image for tool, is relative to assets/icons folder in frontend.' })
   img: string
 
-  @ApiProperty({ enum: AccountCreation })
+  // @ApiProperty({ enum: AccountCreation })
   accountCreation: AccountCreation
 
-  @ApiProperty()
+  // @ApiProperty()
   lastBackup: number
 }
 
 export class StorageDto {
-  @ApiProperty({ description: 'Size string in human-readable format.' })
+  // @ApiProperty({ description: 'Size string in human-readable format.' })
   remaining: string
 
-  @ApiProperty({ minimum: 0, maximum: 100 })
+  // @ApiProperty({ minimum: 0, maximum: 100 })
   percent: number
 }
 
 export class BackupDto {
-  @ApiProperty()
+  // @ApiProperty()
   date: number
 
-  @ApiProperty()
+  // @ApiProperty()
   duration: number
 
-  @ApiProperty()
+  // @ApiProperty()
   compression: number
 
-  @ApiProperty()
+  // @ApiProperty()
   downtime: number
 
-  @ApiProperty({ description: 'Size string in human-readable format.' })
+  // @ApiProperty({ description: 'Size string in human-readable format.' })
   rawSize: string
 
-  @ApiProperty({ description: 'Size string in human-readable format.' })
+  // @ApiProperty({ description: 'Size string in human-readable format.' })
   compressedSize: string
 
-  @ApiProperty()
+  // @ApiProperty()
   toolName: string
 
-  @ApiProperty({ description: 'Path to image for tool, is relative to assets/icons folder in frontend.' })
+  // @ApiProperty({ description: 'Path to image for tool, is relative to assets/icons folder in frontend.' })
   img: string
 }
 
