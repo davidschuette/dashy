@@ -1,4 +1,4 @@
-import { Injectable, Logger, Param } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 
 @Injectable()
 export class LogService extends Logger {
@@ -11,6 +11,10 @@ export class LogService extends Logger {
       if (e instanceof Error) {
         const caller = re.exec(e.stack.split('\n').slice(3).join('\n'))[2]
 
+        if (caller.includes('<anonymous>')) {
+          this.warn(`Logging '<anonymous>' value, reduces usablilty of log output.`)
+        }
+
         if (caller.startsWith('new ')) {
           return caller.replace('new ', '') + '.constructor'
         } else return caller
@@ -18,32 +22,32 @@ export class LogService extends Logger {
     }
   }
 
-  debug(message: string) {
-    const caller = this.getCaller()
+  debug(message: string, context?: string) {
+    const caller = context || this.getCaller()
 
     super.debug(message, caller)
   }
 
-  error(message: string, stack?: string) {
-    const caller = this.getCaller()
+  error(message: string, stack?: string, context?: string) {
+    const caller = context || this.getCaller()
 
     super.error(message, stack, caller)
   }
 
-  log(message: string) {
-    const caller = this.getCaller()
+  log(message: string, context?: string) {
+    const caller = context || this.getCaller()
 
     super.log(message, caller)
   }
 
-  verbose(message: string) {
-    const caller = this.getCaller()
+  verbose(message: string, context?: string) {
+    const caller = context || this.getCaller()
 
     super.verbose(message, caller)
   }
 
-  warn(message: string) {
-    const caller = this.getCaller()
+  warn(message: string, context?: string) {
+    const caller = context || this.getCaller()
 
     super.warn(message, caller)
   }
