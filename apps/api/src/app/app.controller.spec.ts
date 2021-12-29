@@ -1,22 +1,27 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing'
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { BackupService } from './backup/backup.service'
+
+type MockService<T = any> = Partial<Record<keyof T, jest.Mock>>
+const mockAppService: MockService<AppService> = {}
+const mockBackupService: MockService<BackupService> = {}
 
 describe('AppController', () => {
-  let app: TestingModule;
+  let app: TestingModule
 
   beforeAll(async () => {
     app = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
-    }).compile();
-  });
+      providers: [
+        { provide: AppService, useValue: mockAppService },
+        { provide: BackupService, useValue: mockBackupService },
+      ],
+    }).compile()
+  })
 
-  describe('getData', () => {
-    it('should return "Welcome to api!"', () => {
-      const appController = app.get<AppController>(AppController);
-      expect(appController.getData()).toEqual({ message: 'Welcome to api!' });
-    });
-  });
-});
+  it('should be defined', () => {
+    expect(app.get<AppController>(AppController)).toBeDefined()
+  })
+})

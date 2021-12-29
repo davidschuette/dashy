@@ -1,33 +1,16 @@
 import { StorageDto, ToolDto, ToolStatus } from '@dashy/api-interfaces'
-import { LogService } from '@dashy/util/logger'
 import { HttpService } from '@nestjs/axios'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { exec } from 'child_process'
-import { readFileSync, writeFileSync } from 'fs'
 import { firstValueFrom, map } from 'rxjs'
 import { environment } from '../environments/environment'
 import { BackupService } from './backup/backup.service'
-import { Tool } from './models/tool.model'
+import { ToolFileService } from './tool/tool-file.service'
 
 @Injectable()
 export class AppService {
-  private tools: Tool[]
-
-  constructor(private readonly http: HttpService, private readonly backupService: BackupService, private readonly logger: LogService) {
-    this.loadFromDrive()
-  }
-
-  private loadFromDrive() {
-    try {
-      this.tools = JSON.parse(readFileSync(environment.storage.tools).toString())
-    } catch (e) {
-      this.logger.warn(`Could not load file '${environment.storage.tools}', initialising with initTools from configuration`)
-      this.tools = environment.initTools
-    }
-  }
-
-  private flushToDrive() {
-    writeFileSync(environment.storage.tools, JSON.stringify(this.tools))
+  constructor(private readonly http: HttpService, private readonly backupService: BackupService, private readonly toolFileService: ToolFileService) {
+    this.toolFileService.loadFromDrive()
   }
 
   async getTools(): Promise<ToolDto[]> {
@@ -51,7 +34,7 @@ export class AppService {
         .pipe(map((_) => _.data.data.result))
     )
 
-    const tools = this.tools.map((tool) => {
+    const tools = this.toolFileService.getTools().map((tool) => {
       const dto = new ToolDto()
       dto.name = tool.name
       dto.description = tool.description
@@ -117,20 +100,20 @@ export class AppService {
   }
 
   clearMaintenanceStatus(toolName: string) {
-    const tool = this.tools.find((_) => _.name === toolName)
+    const tool = this.toolFileService.getTools().find((_) => _.name === toolName)
 
     if (!tool) throw new NotFoundException('ToolNotFound')
 
     tool.isInMaintenance = false
-    this.flushToDrive()
+    this.toolFileService.flushToDrive()
   }
 
   setMaintenanceStatus(toolName: string) {
-    const tool = this.tools.find((_) => _.name === toolName)
+    const tool = this.toolFileService.getTools().find((_) => _.name === toolName)
 
     if (!tool) throw new NotFoundException('ToolNotFound')
 
     tool.isInMaintenance = true
-    this.flushToDrive()
+    this.toolFileService.flushToDrive()
   }
 }

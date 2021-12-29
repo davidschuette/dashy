@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<FastifyRequest>()
 
     return (
