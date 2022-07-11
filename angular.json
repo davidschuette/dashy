@@ -2,12 +2,13 @@
   "version": 1,
   "projects": {
     "api": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "apps/api",
       "sourceRoot": "apps/api/src",
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@nrwl/node:build",
+          "builder": "@nrwl/node:webpack",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/api",
@@ -30,7 +31,7 @@
           }
         },
         "serve": {
-          "builder": "@nrwl/node:execute",
+          "builder": "@nrwl/node:node",
           "options": {
             "buildTarget": "api:build"
           }
@@ -46,7 +47,7 @@
           "builder": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/api"],
           "options": {
-            "jestConfig": "apps/api/jest.config.js",
+            "jestConfig": "apps/api/jest.config.ts",
             "passWithNoTests": true
           }
         },
@@ -57,6 +58,7 @@
       "tags": []
     },
     "api-interfaces": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "libs/api-interfaces",
       "sourceRoot": "libs/api-interfaces/src",
       "projectType": "library",
@@ -72,12 +74,13 @@
       "tags": []
     },
     "backup": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "apps/backup",
       "sourceRoot": "apps/backup/src",
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@nrwl/node:build",
+          "builder": "@nrwl/node:webpack",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/backup",
@@ -100,7 +103,7 @@
           }
         },
         "serve": {
-          "builder": "@nrwl/node:execute",
+          "builder": "@nrwl/node:node",
           "options": {
             "buildTarget": "backup:build"
           }
@@ -116,7 +119,7 @@
           "builder": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/backup"],
           "options": {
-            "jestConfig": "apps/backup/jest.config.js",
+            "jestConfig": "apps/backup/jest.config.ts",
             "passWithNoTests": true
           }
         },
@@ -127,6 +130,7 @@
       "tags": []
     },
     "frontend": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "projectType": "application",
       "root": "apps/frontend",
       "sourceRoot": "apps/frontend/src",
@@ -210,7 +214,7 @@
           "builder": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/frontend"],
           "options": {
-            "jestConfig": "apps/frontend/jest.config.js",
+            "jestConfig": "apps/frontend/jest.config.ts",
             "passWithNoTests": true
           }
         },
@@ -221,6 +225,7 @@
       "tags": []
     },
     "frontend-e2e": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "apps/frontend-e2e",
       "sourceRoot": "apps/frontend-e2e/src",
       "projectType": "application",
@@ -249,6 +254,7 @@
       "implicitDependencies": ["frontend"]
     },
     "util-logger": {
+      "$schema": "../../../node_modules/nx/schemas/project-schema.json",
       "root": "libs/util/logger",
       "sourceRoot": "libs/util/logger/src",
       "projectType": "library",
@@ -264,7 +270,7 @@
           "builder": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/util/logger"],
           "options": {
-            "jestConfig": "libs/util/logger/jest.config.js",
+            "jestConfig": "libs/util/logger/jest.config.ts",
             "passWithNoTests": true
           }
         }

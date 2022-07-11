@@ -1,4 +1,5 @@
-module.exports = {
+/* eslint-disable */
+export default {
   displayName: 'api',
   preset: '../../jest.preset.js',
   globals: {
@@ -12,4 +13,4 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/apps/api',
-};
+}
