@@ -7,8 +7,7 @@
     "postinstall": "(node ./decorate-angular-cli.js && ngcc --properties es2020 browser module main) || exit 0",
     "start": "nx serve",
     "build": "nx build",
-    "test": "nx test",
-    "prepare": "husky install || exit 0"
+    "test": "nx test"
   },
   "private": true,
   "dependencies": {
@@ -21,14 +20,13 @@
     "@angular/platform-browser": "14.0.5",
     "@angular/platform-browser-dynamic": "14.0.5",
     "@angular/router": "14.0.5",
-    "@nestjs/axios": "^0.0.3",
-    "@nestjs/common": "^8.0.0",
-    "@nestjs/core": "^8.0.0",
-    "@nestjs/platform-express": "^8.0.0",
-    "@nestjs/platform-fastify": "^8.2.3",
-    "@nestjs/schedule": "^1.0.2",
-    "@nestjs/swagger": "^5.1.5",
-    "@ng-bootstrap/ng-bootstrap": "^11.0.1",
+    "@nestjs/axios": "^0.1.0",
+    "@nestjs/common": "^9.0.3",
+    "@nestjs/core": "^9.0.3",
+    "@nestjs/platform-fastify": "^9.0.3",
+    "@nestjs/schedule": "^2.1.0",
+    "@nestjs/swagger": "^6.0.4",
+    "@ng-bootstrap/ng-bootstrap": "^13.0.0-beta.1",
     "@nrwl/angular": "14.4.2",
     "bootstrap": "^4.5.0",
     "fastify-swagger": "^4.12.6",
@@ -45,8 +43,8 @@
     "@angular/cli": "~14.0.0",
     "@angular/compiler-cli": "14.0.5",
     "@angular/language-service": "14.0.5",
-    "@nestjs/schematics": "^8.0.0",
-    "@nestjs/testing": "^8.0.0",
+    "@nestjs/schematics": "^9.0.1",
+    "@nestjs/testing": "^9.0.3",
     "@nrwl/cli": "14.4.2",
     "@nrwl/cypress": "14.4.2",
     "@nrwl/eslint-plugin-nx": "14.4.2",
@@ -66,9 +64,9 @@
     "eslint-plugin-cypress": "^2.10.3",
     "jest": "27.5.1",
     "jest-preset-angular": "11.1.2",
+    "nx": "14.4.2",
     "prettier": "2.7.1",
     "ts-jest": "27.1.4",
-    "typescript": "4.7.4",
-    "nx": "14.4.2"
+    "typescript": "4.7.4"
   }
 }
