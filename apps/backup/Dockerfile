@@ -1,7 +1,7 @@
 ##########################
 # Build Stage
 
-FROM node:16
+FROM node:18
 
 # Create app directory
 WORKDIR /usr/src
@@ -28,7 +28,7 @@ RUN npm run build -- backup --prod
 ##########################
 # Run Stage
 
-FROM node:16
+FROM node:18
 
 # RUN apk --no-cache add --virtual builds-deps build-base python curl
 
