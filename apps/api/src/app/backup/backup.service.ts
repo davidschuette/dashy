@@ -16,8 +16,8 @@ export class BackupService {
     this.fileService.flushToDrive(this.backups)
   }
 
-  getBackups(): BackupDto[] {
-    return this.backups.map(({ date, ...rest }) => ({ date: date.getTime(), ...rest }))
+  getBackups(length: number, skip = 0): BackupDto[] {
+    return this.backups.slice(skip, skip + length).map(({ date, ...rest }) => ({ date: date.getTime(), ...rest }))
   }
 
   getLastBackupTime(toolName: string): number | undefined {

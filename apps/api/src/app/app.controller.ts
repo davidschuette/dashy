@@ -1,5 +1,5 @@
 import { BackupDto, StorageDto, ToolDto } from '@dashy/api-interfaces'
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { AppService } from './app.service'
 import { AuthGuard } from './auth/auth.guard'
@@ -57,7 +57,7 @@ export class AppController {
   @Get('backups')
   @ApiTags('Backups')
   @ApiOkResponse({ type: BackupDto, isArray: true })
-  getBackups(): BackupDto[] {
-    return this.backupService.getBackups()
+  getBackups(@Query('length') length: number, @Query('skip') skip?: number): BackupDto[] {
+    return this.backupService.getBackups(length, skip)
   }
 }

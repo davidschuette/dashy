@@ -1,20 +1,24 @@
 :host {
   display: grid;
-  grid-template-columns: 30% 60%;
+  grid-template-columns: 30% 65%;
   background-color: #fff;
   border-radius: 0.5em;
-  box-shadow: 2px 2px 5px grey;
+  box-shadow: 0 0 5px grey;
+  border: 1px solid rgba(0, 0, 0, 0.125);
 
   .left {
     border-right: 1px solid #dfdfdf;
     list-style-type: none;
     margin: 0;
+    height: 50vh;
+    overflow: auto;
 
     .tool-item {
       display: flex;
       grid-template-columns: auto 1fr;
       border-bottom: 1px solid #dfdfdf;
       padding: 1em;
+      height: 6em;
       cursor: pointer;
 
       img {

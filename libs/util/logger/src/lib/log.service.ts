@@ -9,10 +9,11 @@ export class LogService extends Logger {
       throw new Error()
     } catch (e) {
       if (e instanceof Error) {
-        const caller = re.exec(e.stack.split('\n').slice(3).join('\n'))[2]
+        const callerList = e.stack.split('\n')
+        const caller = re.exec(callerList.slice(3).join('\n'))[2]
 
         if (caller.includes('<anonymous>')) {
-          this.warn(`Logging '<anonymous>' value, reduces usablilty of log output.`)
+          return callerList[8].split(' ')[5]
         }
 
         if (caller.startsWith('new ')) {

@@ -17,7 +17,7 @@ export class DashboardService {
     return this.http.get<StorageDto>('/api/storage')
   }
 
-  getBackups(): Observable<BackupDto[]> {
-    return this.http.get<BackupDto[]>('/api/backups')
+  getBackups(length: number, skip?: number): Observable<BackupDto[]> {
+    return this.http.get<BackupDto[]>(`/api/backups?length=${length + (skip ? '&skip=' + skip : '')}`)
   }
 }

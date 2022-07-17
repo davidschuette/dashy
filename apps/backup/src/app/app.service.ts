@@ -28,13 +28,13 @@ export class AppService implements OnModuleInit {
     }
   }
 
-  onModuleInit() {
+  async onModuleInit() {
     if (environment.production) {
       if (environment.backups.length === 0) {
         this.logger.warn(`No backup jobs set up.`)
       }
 
-      this.initialiseBackupCronJobs()
+      await this.initialiseBackupCronJobs()
     } else {
       this.logger.debug('Skipping cron initialisation due to development mode.')
     }
@@ -56,15 +56,10 @@ export class AppService implements OnModuleInit {
       const toDelete = files.slice(tool.maxNumberOfVersions)
       await Promise.all(toDelete.map((_) => rm(join(environment.storage, _.name))))
 
-      this.logger.log(
-        `Removed ${files.length - tool.maxNumberOfVersions} overhanging version${files.length - tool.maxNumberOfVersions === 1 ? '' : 's'} of tool '${
-          tool.toolName
-        }'`,
-        `BackupJob.${tool.toolName}`
-      )
-    } else {
-      this.logger.debug(`No files to delete for tool '${tool.toolName}'`, `BackupJob.${tool.toolName}`)
+      return files.length - tool.maxNumberOfVersions
     }
+
+    return 0
   }
 
   async initialiseBackupCronJobs() {
@@ -168,9 +163,10 @@ export class AppService implements OnModuleInit {
 
       this.logger.log(`Stopped ${tool.folderName}`, `BackupJob.${tool.toolName}`)
     } else {
-      this.logger.debug(`No commands ${tool.folderName}`, `BackupJob.${tool.toolName}`)
+      this.logger.debug(`No commands for ${tool.folderName}`, `BackupJob.${tool.toolName}`)
     }
 
+    this.logger.log(`Starting sync for folder ${tool.folderName}`, `BackupJob.${tool.toolName}`)
     await this.syncFolder(tool.folderName, tool.basePath)
     this.logger.log(`Synced folder ${tool.folderName}`, `BackupJob.${tool.toolName}`)
 
@@ -182,6 +178,7 @@ export class AppService implements OnModuleInit {
 
     const downtime = Date.now() - time
 
+    this.logger.log(`Starting archiving for ${tool.folderName}`, `BackupJob.${tool.toolName}`)
     const fileName = await this.createArchive(tool)
     const diff = Date.now() - time
 
@@ -189,18 +186,26 @@ export class AppService implements OnModuleInit {
 
     const [rawSize, compressedSize] = await Promise.all([this.getRawSizeOfBackup(fileName), this.getCompressedSizeOfBackup(fileName)])
 
-    await this.deleteBackupFiles(tool)
+    const deletedAmount = await this.deleteBackupFiles(tool)
+
+    if (deletedAmount > 0) {
+      this.logger.log(`Removed ${deletedAmount} overhanging version${deletedAmount === 1 ? '' : 's'} of tool '${tool.toolName}'`, `BackupJob.${tool.toolName}`)
+    } else {
+      this.logger.debug(`No files to delete for tool '${tool.toolName}'`, `BackupJob.${tool.toolName}`)
+    }
 
     await this.notifyServer({
       date: Date.now(),
       toolName: tool.toolName,
       img: tool.img,
-      downtime,
+      downtime: tool.commands ? downtime : 0,
       duration: diff,
       compression: diff - downtime,
       rawSize,
       compressedSize,
     })
+
+    this.logger.log(`Successfully notified server of backup job`, `BackupJob.${tool.toolName}`)
   }
 
   /*
@@ -209,10 +214,10 @@ export class AppService implements OnModuleInit {
   createArchive(tool: ToolBackup): Promise<string> {
     return new Promise((resolve) => {
       const fileName = `${tool.archiveName}_${new Date().toJSON()}.tar.gz`
-      const command = exec(`tar -c --use-compress-program=pigz ${join(environment.storage, tool.folderName)} -f ${join(environment.storage, fileName)}`)
+      const command = exec(`tar -zc --use-compress-program=pigz  -f ${join(environment.storage, fileName)} ${join(environment.storage, tool.folderName)}`)
 
       command.stderr.on('data', (err) => {
-        this.logger.error(err)
+        this.logger.error(err, 'AppService.createArchive')
       })
 
       command.on('exit', () => {

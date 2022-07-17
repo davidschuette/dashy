@@ -17,7 +17,7 @@ export class PageComponent implements OnInit {
   ngOnInit(): void {
     this.storage$ = this.dashboardService.getStorage()
 
-    this.backups$ = this.dashboardService.getBackups().pipe(
+    this.backups$ = this.dashboardService.getBackups(50).pipe(
       map((_) => {
         const obj: { [k: string]: BackupDto[] } = {}
 
