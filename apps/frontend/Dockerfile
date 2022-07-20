@@ -33,7 +33,7 @@ RUN npm run build -- frontend --prod
 ##########################
 # Run Stage
 
-FROM nginx:1.21.4-alpine
+FROM nginx:1.23.1-alpine
 
 WORKDIR /usr/src
 
