@@ -10,7 +10,7 @@ jobs:
     runs-on: [self-hosted, linux, nx]
     if: ${{ github.event_name != 'pull_request' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         name: Checkout [main]
         with:
           fetch-depth: 0
@@ -26,7 +26,7 @@ jobs:
     runs-on: [self-hosted, linux, nx]
     if: ${{ github.event_name == 'pull_request' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
