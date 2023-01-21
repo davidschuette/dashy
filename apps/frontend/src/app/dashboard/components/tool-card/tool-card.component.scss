@@ -12,6 +12,11 @@
   transform: translateY(-0.1em);
 }
 
+.list-group {
+  user-select: none;
+  cursor: default;
+}
+
 img {
   height: 15em;
   width: 100%;
@@ -27,6 +32,6 @@ img {
 }
 
 .description {
-  max-height: 15em;
+  max-height: 10em;
   overflow: auto;
 }

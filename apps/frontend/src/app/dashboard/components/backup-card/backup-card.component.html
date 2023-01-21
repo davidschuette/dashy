@@ -1,12 +1,13 @@
 <div class="card">
   <div class="img-container">
     <img attr.src="assets/icons/{{ backup.img }}" class="card-img-top" alt="..." />
+    <button (click)="clicked.emit()"></button>
   </div>
   <div class="card-body">
     <ul class="list-group list-group-flush">
       <li class="list-group-item">
         <h5 class="card-title">
-          {{ backup.toolName }}<span class="right text-muted">{{ backup.date | date: 'd.M.yyyy, HH:mm' }}</span>
+          {{ backup.toolName }}<span class="right text-muted">{{ backup.date.replace(' ', 'T') | date: 'd.M.yyyy, HH:mm' }}</span>
         </h5>
       </li>
       <li class="list-group-item">

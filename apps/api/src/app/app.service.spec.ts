@@ -1,50 +1,42 @@
-import { ToolDto, ToolStatus } from '@dashy/api-interfaces'
+import { ToolDto } from '@dashy/api-interfaces'
+import { LogService } from '@dashy/util/logger'
 import { HttpService } from '@nestjs/axios'
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { of } from 'rxjs'
 import { AppService } from './app.service'
 import { BackupService } from './backup/backup.service'
-import { ToolFileService } from './tool/tool-file.service'
+import { Sqlite3Service } from './sqlite3/services/sqlite3.service'
 
 type MockService<T = any> = Partial<Record<keyof T, jest.Mock>>
 const mockHttpService: MockService<HttpService> = { get: jest.fn() }
 const mockBackupService: MockService<BackupService> = { getLastBackupTime: jest.fn() }
-const mockToolFileService: MockService<ToolFileService> = { flushToDrive: jest.fn(), loadFromDrive: jest.fn(), getTools: jest.fn() }
-
-mockToolFileService.flushToDrive.mockReturnValue(undefined)
-mockToolFileService.loadFromDrive.mockReturnValue([
-  {
-    name: 'name',
-    description: 'desc',
-    url: 'url',
-    img: 'img',
-    containerNames: ['cName1', 'cName2'],
-    accountCreation: 1,
-    isInMaintenance: true,
-  },
-])
+const mockSqlite3Service: MockService<Sqlite3Service> = { get: jest.fn(), getOne: jest.fn(), run: jest.fn() }
+const mockLogService: MockService<LogService> = {}
 
 describe('AppService', () => {
   let service: AppService
   let httpService: MockService<HttpService>
   let backupService: MockService<BackupService>
-  let toolFileService: MockService<ToolFileService>
+  let sqlite3Service: MockService<Sqlite3Service>
+  let logService: MockService<LogService>
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
         AppService,
+        { provide: LogService, useValue: mockLogService },
         { provide: HttpService, useValue: mockHttpService },
         { provide: BackupService, useValue: mockBackupService },
-        { provide: ToolFileService, useValue: mockToolFileService },
+        { provide: Sqlite3Service, useValue: mockSqlite3Service },
       ],
     }).compile()
 
     service = app.get<AppService>(AppService)
     httpService = app.get(HttpService)
     backupService = app.get(BackupService)
-    toolFileService = app.get(ToolFileService)
+    sqlite3Service = app.get(Sqlite3Service)
+    logService = app.get(LogService)
   })
 
   describe('getTools', () => {
@@ -62,7 +54,7 @@ describe('AppService', () => {
         }),
       ]
 
-      mockToolFileService.getTools.mockReturnValueOnce([
+      mockSqlite3Service.get.mockReturnValueOnce([
         {
           name: 'name',
           description: 'desc',
@@ -126,7 +118,7 @@ describe('AppService', () => {
         }),
       ]
 
-      mockToolFileService.getTools.mockReturnValueOnce([
+      mockSqlite3Service.get.mockReturnValueOnce([
         {
           name: 'name',
           description: 'desc',
@@ -190,7 +182,7 @@ describe('AppService', () => {
         }),
       ]
 
-      mockToolFileService.getTools.mockReturnValueOnce([
+      mockSqlite3Service.get.mockReturnValueOnce([
         {
           name: 'name',
           description: 'desc',
@@ -257,7 +249,7 @@ describe('AppService', () => {
             isInMaintenance: true,
           },
         ]
-        mockToolFileService.getTools.mockImplementation(() => tools)
+        mockSqlite3Service.get.mockImplementation(() => tools)
 
         expect(service.clearMaintenanceStatus('name')).toBeUndefined()
         expect(tools[0].isInMaintenance).toEqual(false)
@@ -277,7 +269,7 @@ describe('AppService', () => {
             isInMaintenance: true,
           },
         ]
-        mockToolFileService.getTools.mockImplementation(() => tools)
+        mockSqlite3Service.get.mockImplementation(() => tools)
 
         try {
           expect(service.clearMaintenanceStatus('not name')).not.toBeUndefined()
@@ -303,7 +295,7 @@ describe('AppService', () => {
             isInMaintenance: false,
           },
         ]
-        mockToolFileService.getTools.mockImplementation(() => tools)
+        mockSqlite3Service.get.mockImplementation(() => tools)
 
         expect(service.setMaintenanceStatus('name')).toBeUndefined()
         expect(tools[0].isInMaintenance).toEqual(true)
@@ -323,7 +315,7 @@ describe('AppService', () => {
             isInMaintenance: true,
           },
         ]
-        mockToolFileService.getTools.mockImplementation(() => tools)
+        mockSqlite3Service.get.mockImplementation(() => tools)
 
         try {
           expect(service.setMaintenanceStatus('not name')).not.toBeUndefined()

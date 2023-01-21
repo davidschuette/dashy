@@ -1,6 +1,5 @@
 export class ToolBackup {
-  toolName: string
-  img: string
+  toolId: string
   folderName: string
   archiveName: string
   basePath: string

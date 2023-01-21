@@ -5,20 +5,9 @@ networks:
     driver: bridge
 
 services:
-  docker-exporter:
-    container_name: dashy_docker-exporter
-    image: prometheusnet/docker_exporter:latest
-    restart: always
-    networks:
-      - dashy-net
-    depends_on:
-      - prometheus
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
   prometheus:
     container_name: dashy_prometheus
-    image: prom/prometheus:v2.31.1
+    image: prom/prometheus:v2.41.0
     hostname: prometheus
     restart: always
     networks:
@@ -37,7 +26,7 @@ services:
 
   grafana:
     container_name: dashy_grafana
-    image: grafana/grafana:8.2.5
+    image: grafana/grafana:9.3.2
     hostname: grafana
     restart: always
     environment:
@@ -59,12 +48,11 @@ services:
       dockerfile: apps/api/Dockerfile
     restart: always
     volumes:
-      - ./deployment/api_data/tools.json:/usr/src/tools.json
-      - ./deployment/api_data/backups.json:/usr/src/backups.json
+      - ./deployment/api_data/data.db:/usr/src/data.db
     networks:
       - dashy-net
     ports:
-      - 3333:3333
+      - 3000:3000
     depends_on:
       - prometheus
 
@@ -82,14 +70,25 @@ services:
     depends_on:
       - api
 
-  backup:
-    container_name: dashy_backup
-    image: dashy-backup:local
-    build:
-      context: .
-      dockerfile: apps/backup/Dockerfile
+  loki:
+    image: grafana/loki:2.7.1
+    command: -config.file=/etc/loki/config.yaml
     restart: always
+    networks:
+      - dashy-net
     ports:
-      - 3334:3334
+      - 3100:3100
     volumes:
-      - ./deployment/backup_data:/usr/src/data
+      - ./config/loki/config.yaml:/etc/loki/config.yaml
+      - ./deployment/loki/wal:/wal
+
+  promtail:
+    image: grafana/promtail:2.6.1
+    command: -config.file=/etc/promtail/config.yaml
+    restart: always
+    networks:
+      - dashy-net
+    volumes:
+      - ./config/promtail/config.yaml:/etc/promtail/config.yaml
+      # - /var/run/docker.sock:/var/run/docker.sock
+      # - ./logs:/var/log/repo

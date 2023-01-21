@@ -9,12 +9,15 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
 
 import { AppModule } from './app/app.module'
+import { LoggingInterceptor, LogService } from '@dashy/util/logger'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter())
   const globalPrefix = 'api'
+  const logger = app.get(LogService)
   app.setGlobalPrefix(globalPrefix)
   app.enableShutdownHooks()
+  app.useGlobalInterceptors(new LoggingInterceptor(logger))
 
   const config = new DocumentBuilder().setTitle('Dashy Backup').setDescription('Backup tool').setVersion('1.0').addTag('Backups').build()
   const document = SwaggerModule.createDocument(app, config)
@@ -22,7 +25,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3334
   await app.listen(port)
-  Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`)
+  logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`, 'Main')
 }
 
 bootstrap()

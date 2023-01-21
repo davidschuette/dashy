@@ -1,14 +1,14 @@
 {
-  "version": 1,
+  "version": 2,
   "projects": {
     "api": {
       "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "apps/api",
       "sourceRoot": "apps/api/src",
       "projectType": "application",
-      "architect": {
+      "targets": {
         "build": {
-          "builder": "@nrwl/node:webpack",
+          "executor": "@nrwl/node:webpack",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/api",
@@ -31,20 +31,20 @@
           }
         },
         "serve": {
-          "builder": "@nrwl/node:node",
+          "executor": "@nrwl/node:node",
           "options": {
             "buildTarget": "api:build"
           }
         },
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "outputs": ["{options.outputFile}"],
           "options": {
             "lintFilePatterns": ["apps/api/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/api"],
           "options": {
             "jestConfig": "apps/api/jest.config.ts",
@@ -52,7 +52,7 @@
           }
         },
         "version": {
-          "builder": "@jscutlery/semver:version"
+          "executor": "@jscutlery/semver:version"
         }
       },
       "tags": []
@@ -62,9 +62,9 @@
       "root": "libs/api-interfaces",
       "sourceRoot": "libs/api-interfaces/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "outputs": ["{options.outputFile}"],
           "options": {
             "lintFilePatterns": ["libs/api-interfaces/**/*.ts"]
@@ -78,9 +78,9 @@
       "root": "apps/backup",
       "sourceRoot": "apps/backup/src",
       "projectType": "application",
-      "architect": {
+      "targets": {
         "build": {
-          "builder": "@nrwl/node:webpack",
+          "executor": "@nrwl/node:webpack",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/backup",
@@ -103,20 +103,20 @@
           }
         },
         "serve": {
-          "builder": "@nrwl/node:node",
+          "executor": "@nrwl/node:node",
           "options": {
             "buildTarget": "backup:build"
           }
         },
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "outputs": ["{options.outputFile}"],
           "options": {
             "lintFilePatterns": ["apps/backup/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/backup"],
           "options": {
             "jestConfig": "apps/backup/jest.config.ts",
@@ -124,7 +124,7 @@
           }
         },
         "version": {
-          "builder": "@jscutlery/semver:version"
+          "executor": "@jscutlery/semver:version"
         }
       },
       "tags": []
@@ -135,9 +135,9 @@
       "root": "apps/frontend",
       "sourceRoot": "apps/frontend/src",
       "prefix": "dashy",
-      "architect": {
+      "targets": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "executor": "@nrwl/angular:webpack-browser",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/frontend",
@@ -148,7 +148,10 @@
             "inlineStyleLanguage": "scss",
             "assets": ["apps/frontend/src/favicon.ico", "apps/frontend/src/assets"],
             "styles": ["apps/frontend/src/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "customWebpackConfig": {
+              "path": "apps/frontend/webpack.config.js"
+            }
           },
           "configurations": {
             "production": {
@@ -184,7 +187,7 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "executor": "@nrwl/angular:webpack-server",
           "configurations": {
             "production": {
               "browserTarget": "frontend:build:production"
@@ -199,19 +202,19 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "executor": "@angular-devkit/build-angular:extract-i18n",
           "options": {
             "browserTarget": "frontend:build"
           }
         },
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/frontend/src/**/*.ts", "apps/frontend/src/**/*.html"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/frontend"],
           "options": {
             "jestConfig": "apps/frontend/jest.config.ts",
@@ -219,7 +222,7 @@
           }
         },
         "version": {
-          "builder": "@jscutlery/semver:version"
+          "executor": "@jscutlery/semver:version"
         }
       },
       "tags": []
@@ -229,9 +232,9 @@
       "root": "apps/frontend-e2e",
       "sourceRoot": "apps/frontend-e2e/src",
       "projectType": "application",
-      "architect": {
+      "targets": {
         "e2e": {
-          "builder": "@nrwl/cypress:cypress",
+          "executor": "@nrwl/cypress:cypress",
           "options": {
             "cypressConfig": "apps/frontend-e2e/cypress.json",
             "devServerTarget": "frontend:serve:development"
@@ -243,7 +246,7 @@
           }
         },
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "outputs": ["{options.outputFile}"],
           "options": {
             "lintFilePatterns": ["apps/frontend-e2e/**/*.{js,ts}"]
@@ -258,16 +261,16 @@
       "root": "libs/util/logger",
       "sourceRoot": "libs/util/logger/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "outputs": ["{options.outputFile}"],
           "options": {
             "lintFilePatterns": ["libs/util/logger/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/util/logger"],
           "options": {
             "jestConfig": "libs/util/logger/jest.config.ts",

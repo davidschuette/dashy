@@ -1,16 +1,20 @@
-import { Module } from '@nestjs/common'
+import { LogModule } from '@dashy/util/logger'
 import { HttpModule } from '@nestjs/axios'
-
+import { Global, Module } from '@nestjs/common'
+import { ScheduleModule } from '@nestjs/schedule'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { BackupService } from './backup/backup.service'
-import { LogModule } from '@dashy/util/logger'
-import { ToolFileService } from './tool/tool-file.service'
-import { FileService } from './backup/file.service'
+import { BackupModule } from './backup/backup.module'
+import { NativeModule } from './native/native.module'
+import { Sqlite3Module } from './sqlite3/sqlite3.module'
+import { ToolModule } from './tool/tool.module'
+import { WebsocketController } from './websocket.controller'
 
+@Global()
 @Module({
-  imports: [HttpModule, LogModule],
+  imports: [HttpModule, LogModule, Sqlite3Module, ToolModule, NativeModule, BackupModule, ScheduleModule.forRoot()],
   controllers: [AppController],
-  providers: [AppService, BackupService, ToolFileService, FileService],
+  providers: [AppService, WebsocketController],
+  exports: [LogModule, WebsocketController],
 })
 export class AppModule {}

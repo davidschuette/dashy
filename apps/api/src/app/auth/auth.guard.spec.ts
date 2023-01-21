@@ -13,8 +13,6 @@ describe('AuthGuard', () => {
     environment.apiKey = key
 
     const guard = new AuthGuard()
-    // const request = context.switchToHttp().getRequest<FastifyRequest>()
-    // request.headers.authorization
 
     const context1: ExecutionContext = {
       // @ts-expect-error

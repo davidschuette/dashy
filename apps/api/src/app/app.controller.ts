@@ -1,13 +1,15 @@
 import { BackupDto, StorageDto, ToolDto } from '@dashy/api-interfaces'
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common'
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common'
+import { ApiAcceptedResponse, ApiBearerAuth, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
+import { environment } from '../environments/environment'
 import { AppService } from './app.service'
 import { AuthGuard } from './auth/auth.guard'
-import { BackupService } from './backup/backup.service'
+import { BackupService } from './backup/services/backup.service'
+import { ToolService } from './tool/services/tool.service'
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService, private readonly backupService: BackupService) {}
+  constructor(private readonly appService: AppService, private readonly backupService: BackupService, private readonly toolService: ToolService) {}
 
   @Get('data')
   getData() {
@@ -18,7 +20,7 @@ export class AppController {
   @ApiTags('Tools')
   @ApiOkResponse({ type: ToolDto, isArray: true })
   getTools(): Promise<ToolDto[]> {
-    return this.appService.getTools()
+    return this.toolService.getTools()
   }
 
   @Get('storage')
@@ -28,36 +30,28 @@ export class AppController {
     return this.appService.getStorage()
   }
 
-  @Post('tools/:toolName/maintenance')
-  @UseGuards(AuthGuard)
-  @HttpCode(HttpStatus.ACCEPTED)
-  @ApiTags('Tools')
-  @ApiBearerAuth()
-  setMaintenanceStatus(@Param('toolName') toolName: string): void {
-    return this.appService.setMaintenanceStatus(toolName)
-  }
-
-  @Delete('tools/:toolName/maintenance')
-  @UseGuards(AuthGuard)
-  @HttpCode(HttpStatus.ACCEPTED)
-  @ApiTags('Tools')
-  @ApiBearerAuth()
-  clearMaintenanceStatus(@Param('toolName') toolName: string): void {
-    return this.appService.clearMaintenanceStatus(toolName)
-  }
-
-  @Post('backups')
+  @Post('tools/:toolId/backup')
   @UseGuards(AuthGuard)
   @ApiTags('Backups')
   @ApiBearerAuth()
-  createBackup(@Body() data: BackupDto): void {
-    return this.backupService.createBackup(data)
+  createBackup(@Param('toolId') toolId: string, @Body() data: BackupDto): Promise<void> {
+    return this.backupService.createBackup(toolId, data)
   }
 
   @Get('backups')
   @ApiTags('Backups')
   @ApiOkResponse({ type: BackupDto, isArray: true })
-  getBackups(@Query('length') length: number, @Query('skip') skip?: number): BackupDto[] {
+  @ApiQuery({ name: 'length', required: false, type: Number })
+  @ApiQuery({ name: 'skip', required: false, type: Number })
+  getBackups(@Query('length') length: number, @Query('skip') skip?: number): Promise<BackupDto[]> {
     return this.backupService.getBackups(length, skip)
+  }
+
+  @Post('backups/:toolId/trigger')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiAcceptedResponse({ description: 'The backup job has been trigger and will run in the background.' })
+  @ApiParam({ name: 'toolId', enum: environment.backups.map((_) => _.toolId) })
+  triggerBackup(@Param('toolId') toolId: string): Promise<void> {
+    return this.backupService.triggerBackup(toolId)
   }
 }

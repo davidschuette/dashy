@@ -13,7 +13,7 @@ export class LogService extends Logger {
         const caller = re.exec(callerList.slice(3).join('\n'))[2]
 
         if (caller.includes('<anonymous>')) {
-          return callerList[8].split(' ')[5]
+          return callerList[8]?.split(' ')[5]
         }
 
         if (caller.startsWith('new ')) {
@@ -51,5 +51,9 @@ export class LogService extends Logger {
     const caller = context || this.getCaller()
 
     super.warn(message, caller)
+  }
+
+  request(method: string, url: string, processingTime: number | undefined, status: number) {
+    this.verbose(`${method.toUpperCase()} [${processingTime !== undefined ? processingTime + 'ms' : ''}] [${status}] ${url}`, 'Request')
   }
 }

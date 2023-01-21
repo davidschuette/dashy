@@ -1,0 +1,91 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/api/prom/push
+
+scrape_configs:
+  - job_name: nginx
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          __path__: /var/log/repo/proxy/json_access.log
+        
+
+  - job_name: achievements-api
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: achievements-api
+          __path__: /var/log/repo/achievements/api/combined*.log
+
+  - job_name: auth-api
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: auth-api
+          __path__: /var/log/repo/auth/api/combined*.log
+
+  - job_name: contests-api
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: contests-api
+          __path__: /var/log/repo/contests/api/combined*.log
+
+  - job_name: contests-scheduler
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: contests-scheduler
+          __path__: /var/log/repo/contests/scheduler/combined*.log
+
+  - job_name: groups-api
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: groups-api
+          __path__: /var/log/repo/groups/api/combined*.log
+
+  - job_name: mail-api
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: mail-api
+          __path__: /var/log/repo/mail/api/combined*.log
+
+  - job_name: moderation-api
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: moderation-api
+          __path__: /var/log/repo/moderation/api/combined*.log
+
+  - job_name: notifications-api
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: notifications-api
+          __path__: /var/log/repo/notifications/api/combined*.log
+
+  - job_name: users-api
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: users-api
+          __path__: /var/log/repo/users/api/combined*.log
