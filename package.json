@@ -27,7 +27,7 @@
     "@nestjs/platform-fastify": "9.0.5",
     "@nestjs/platform-socket.io": "^9.2.1",
     "@nestjs/schedule": "2.1.0",
-    "@nestjs/swagger": "6.0.4",
+    "@nestjs/swagger": "6.3.0",
     "@nestjs/websockets": "^9.2.1",
     "@ng-bootstrap/ng-bootstrap": "13.0.0-beta.1",
     "@nrwl/angular": "14.4.3",
